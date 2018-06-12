@@ -1,5 +1,7 @@
 import React, { Component, Fragment } from 'react';
-import { Row, Col} from 'reactstrap';
+// import { Row, Col} from 'reactstrap';
+import Row from '@cwds/components/lib/Row';
+import Col from '@cwds/components/lib/Col';
 import PropTypes from 'prop-types'
 
 import '../../style.css';
