@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-// import { Container, Row, Col } from 'reactstrap';
 import Container from '@cwds/components/lib/Container';
 import Row from '@cwds/components/lib/Row';
 import Col from '@cwds/components/lib/Col';
