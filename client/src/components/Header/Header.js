@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+// import { GlobalHeader } from 'react-wood-duck';
 import AppBar from '@cwds/components/lib/AppBar';
 import { trimSafely } from '../../util/formatters';
 import UserAccountService from './UserAccountService';

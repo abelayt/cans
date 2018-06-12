@@ -1,6 +1,8 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-import { Row, Col, Breadcrumb, BreadcrumbItem } from 'reactstrap';
+// import { Row, Col, Breadcrumb, BreadcrumbItem } from 'reactstrap';
+import Row from '@cwds/components/lib/Row';
+import Col from '@cwds/components/lib/Col';
 import PageInfo from './PageInfo';
 
 describe('<PageInfo />', () => {
