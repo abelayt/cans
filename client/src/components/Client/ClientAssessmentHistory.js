@@ -91,11 +91,14 @@ class ClientAssessmentHistory extends Component {
     }
 
     return assessments.map(assessment => {
-      const { id, event_date, updated_timestamp, updated_by, status } = assessment;
+      const { id, event_date, status } = assessment;
+      const { updated_timestamp, updated_by, created_timestamp, created_by } = assessment;
       const formattedEventDate = toDateFormat(event_date);
       const actionVerb = getActionVerbByStatus(status);
-      const formattedUpdatedTimestamp = toDateFormat(updated_timestamp);
-      const updatedByName = `${updated_by.first_name} ${updated_by.last_name}`;
+      const timestamp = updated_timestamp || created_timestamp;
+      const formattedTimestamp = toDateFormat(timestamp);
+      const user = updated_by || created_by || {};
+      const updatedByName = `${user.first_name} ${user.last_name}`;
       return (
         <Container key={id} className={'history-item'}>
           <Row>
@@ -115,7 +118,7 @@ class ClientAssessmentHistory extends Component {
                     color={'textSecondary'}
                     className={'item-timestamp'}
                   >
-                    {`${actionVerb} on ${formattedUpdatedTimestamp} by ${updatedByName}`}
+                    {`${actionVerb} on ${formattedTimestamp} by ${updatedByName}`}
                   </Typography>
                 </Col>
               </Row>

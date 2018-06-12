@@ -22,13 +22,24 @@ const assessmentInProgress = {
 };
 
 const assessmentSubmitted = {
-  id: 97501,
+  id: 97502,
   status: 'SUBMITTED',
   event_date: '2018-01-05',
   updated_timestamp: '2018-06-06T15:37:32.000Z',
   updated_by: {
     first_name: 'Name 2',
     last_name: 'LastName 2',
+  },
+};
+
+const assessmentWithNoUpdateInfo = {
+  id: 97503,
+  status: 'IN_PROGRESS',
+  event_date: '2018-01-05',
+  created_timestamp: '2018-06-06T15:37:32.000Z',
+  created_by: {
+    first_name: 'Name 3',
+    last_name: 'LastName 3',
   },
 };
 
@@ -120,6 +131,15 @@ describe('<ClientAssessmentHistory', () => {
         ).toEqual('1/5/2018 CANS');
         const timestamp = wrapper.find('.item-timestamp').get(0).props.children;
         expect(timestamp).toEqual('Submitted on 6/6/2018 by Name 2 LastName 2');
+      });
+
+      it('renders assessment with no update info (create info only)', async () => {
+        // given + when
+        const wrapper = await prepareWrapper([assessmentWithNoUpdateInfo]);
+
+        // then
+        const timestamp = wrapper.find('.item-timestamp').get(0).props.children;
+        expect(timestamp).toEqual('Saved on 6/6/2018 by Name 3 LastName 3');
       });
     });
 
