@@ -75,9 +75,10 @@ class Header extends React.Component {
     const { userName, userInitials } = this.state;
     return (
       <AppBar
-        profileName={userName}
-        profileId={userInitials}
-        profileAvatar={userInitials}
+      // <GlobalHeader
+        // profileName={userName}
+        // profileId={userInitials}
+        // profileAvatar={userInitials}
       />
     );
   };
