@@ -12,6 +12,11 @@ export class AssessmentService {
   static fetchNewAssessment() {
     return appApi.get('/instruments/1').then(response => response.data);
   }
+  static search(searchRequest) {
+    return appApi
+      .post('/assessments/_search', searchRequest)
+      .then(response => response.data);
+  }
 }
 
 export default AssessmentService;

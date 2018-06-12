@@ -55,28 +55,27 @@ class Client extends Component {
           <Grid item xs={12}>
             <Card className={'card'}>
               <CardHeader
-                className={'card-header'}
+                className={'card-header-cans'}
                 title="Child/Youth Information"
               />
-              <CardContent>
-                {childData && childData.id ? (
-                  <Grid container spacing={24}>
-                    {this.renderClientData(childData.first_name, 'First Name')}
-                    {this.renderClientData(childData.last_name, 'Last Name')}
-                    {this.renderClientData(childData.dob, 'Birth Date')}
-                    {this.renderClientData(childData.case_id, 'Case Number')}
-                    {this.renderClientData(childData.county.name, 'County')}
-                  </Grid>
-                ) : (
-                  <span id={'no-data'}>No Child Data Found</span>
-                )}
-              </CardContent>
+              <div className={'content'}>
+                <CardContent>
+                  {childData && childData.id ? (
+                    <Grid container spacing={24}>
+                      {this.renderClientData(childData.first_name, 'First Name')}
+                      {this.renderClientData(childData.last_name, 'Last Name')}
+                      {this.renderClientData(childData.dob, 'Birth Date')}
+                      {this.renderClientData(childData.case_id, 'Case Number')}
+                      {this.renderClientData(childData.county.name, 'County')}
+                    </Grid>
+                  ) : (
+                    <span id={'no-data'}>No Child Data Found</span>
+                  )}
+                </CardContent>
+              </div>
             </Card>
           </Grid>
-          <ClientAssessmentHistory
-            clientFirstName={childData.first_name}
-            clientLastName={childData.last_name}
-          />
+          <ClientAssessmentHistory clientId={childData.id} />
         </Grid>
       </Fragment>
     );
