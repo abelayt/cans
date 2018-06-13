@@ -1,12 +1,10 @@
 defaults: &defaults
   cans_api_base_url: <%= ENV.fetch('CANS_API_BASE_URL', 'http://localhost:8080') %>
   perry_base_url: <%= ENV.fetch('PERRY_BASE_URL', 'http://localhost:18080/perry') %>
-#  cans_api_base_url: <%= ENV.fetch('CANS_API_BASE_URL', 'http://cans-api:8080') %>
-#  perry_base_url: <%= ENV.fetch('PERRY_BASE_URL', 'http://perry:8080/perry') %>
 development:
   <<: *defaults
 test:
-  cans_api_base_url: 'https://cans-api.test'
-  perry_base_url: 'https://perry.test'
+  cans_api_base_url: 'https://cans-api.test:8080'
+  perry_base_url: 'https://perry.test:8080'
 production:
   <<: *defaults

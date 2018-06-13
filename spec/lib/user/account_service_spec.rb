@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'spec_helper'
+
 module User
   describe AccountService do
     let(:security_gateway) { instance_double('Infrastructure::SecurityGateway') }
