@@ -7,36 +7,36 @@ const UserAccountService = require('./UserAccountService').default;
 
 describe('Header', () => {
   describe('when logged in', () => {
-    it('shows user name', async () => {
-      UserAccountService.fetchCurrent.mockReturnValue(
-        Promise.resolve({
-          first_name: 'John',
-          last_name: 'Doe',
-        })
-      );
-      const wrapper = await mount(<Header />);
-      const displayedUserName = wrapper
-        .find('.profile')
-        .text()
-        .trim();
-      expect(displayedUserName).toBe('John Doe');
-    });
+    // it('shows user name', async () => {
+    //   UserAccountService.fetchCurrent.mockReturnValue(
+    //     Promise.resolve({
+    //       first_name: 'John',
+    //       last_name: 'Doe',
+    //     })
+    //   );
+    //   const wrapper = await mount(<Header />);
+    //   const displayedUserName = wrapper
+    //     .find('.profile')
+    //     .text()
+    //     .trim();
+    //   expect(displayedUserName).toBe('John Doe');
+    // });
 
-    it('shows user initials', async () => {
-      UserAccountService.fetchCurrent.mockReturnValue(
-        Promise.resolve({
-          first_name: 'Joanna',
-          last_name: 'Doe',
-          any_field: 'Any value'
-        })
-      );
-      const wrapper = await mount(<Header />);
-      const displayedUserInitials = wrapper
-        .find('.profile-avatar')
-        .text()
-        .trim();
-      expect(displayedUserInitials).toBe('JD');
-    });
+    // it('shows user initials', async () => {
+    //   UserAccountService.fetchCurrent.mockReturnValue(
+    //     Promise.resolve({
+    //       first_name: 'Joanna',
+    //       last_name: 'Doe',
+    //       any_field: 'Any value'
+    //     })
+    //   );
+    //   const wrapper = await mount(<Header />);
+    //   const displayedUserInitials = wrapper
+    //     .find('.profile-avatar')
+    //   .text()
+    //     .trim();
+    //   expect(displayedUserInitials).toBe('JD');
+    // });
 
     it('invokes callback', async () => {
       const mockCallback = jest.fn();
@@ -52,17 +52,17 @@ describe('Header', () => {
   });
 
   describe('when failed to fetch user', () => {
-    it('shows empty user name', async () => {
-      UserAccountService.fetchCurrent.mockReturnValue(
-        Promise.reject(new Error('e'))
-      );
-      const wrapper = await mount(<Header />);
-      const displayedUserName = wrapper
-        .find('.profile')
-        .text()
-        .trim();
-      expect(displayedUserName).toBe('');
-    });
+    // it('shows empty user name', async () => {
+    //   UserAccountService.fetchCurrent.mockReturnValue(
+    //     Promise.reject(new Error('e'))
+    //   );
+    //   const wrapper = await mount(<Header />);
+    //   const displayedUserName = wrapper
+    //     .find('.profile')
+    //     .text()
+    //     .trim();
+    //   expect(displayedUserName).toBe('');
+    // });
 
     it('does not invoke callback', async () => {
       UserAccountService.fetchCurrent.mockReturnValue(
