@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-// import { GlobalHeader } from 'react-wood-duck';
-import AppBar from '@cwds/components/lib/AppBar';
+import { GlobalHeader } from 'react-wood-duck';
 import { trimSafely } from '../../util/formatters';
 import UserAccountService from './UserAccountService';
 
@@ -74,11 +73,10 @@ class Header extends React.Component {
   render = () => {
     const { userName, userInitials } = this.state;
     return (
-      <AppBar
-      // <GlobalHeader
-        // profileName={userName}
-        // profileId={userInitials}
-        // profileAvatar={userInitials}
+      <GlobalHeader
+        profileName={userName}
+        profileId={userInitials}
+        profileAvatar={userInitials}
       />
     );
   };
