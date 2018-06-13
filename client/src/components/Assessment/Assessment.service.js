@@ -17,6 +17,9 @@ export class AssessmentService {
       .post('/assessments/_search', searchRequest)
       .then(response => response.data);
   }
+  static postAssessment(assessment) {
+    return appApi.post('/assessments', assessment).then(response => response.data);
+  }
 }
 
 export default AssessmentService;

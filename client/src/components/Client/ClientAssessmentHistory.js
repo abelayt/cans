@@ -58,13 +58,11 @@ class ClientAssessmentHistory extends Component {
   }
 
   renderAddCansButton() {
-    const { clientFirstName, clientLastName } = this.props;
+    const childId = this.props.clientId;
     return (
       <Link
         to={{
-          pathname: '/assessments',
-          clientFirstName: clientFirstName,
-          clientLastName: clientLastName,
+          pathname: `/clients/${childId}/assessments`,
         }}
       >
         <Button size="small" color="inherit" className={'card-header-cans-button'}>
@@ -91,7 +89,7 @@ class ClientAssessmentHistory extends Component {
     }
 
     return assessments.map(assessment => {
-      const { id, event_date, status } = assessment;
+      const { id, event_date, status, person } = assessment;
       const { updated_timestamp, updated_by, created_timestamp, created_by } = assessment;
       const formattedEventDate = toDateFormat(event_date);
       const actionVerb = getActionVerbByStatus(status);
@@ -106,7 +104,7 @@ class ClientAssessmentHistory extends Component {
             <Col xs="11">
               <Row>
                 <Col xs="12">
-                  <Link to={{ pathname: `/assessments/${id}` }} className={'underlined'}>
+                  <Link to={{ pathname: `${person.id}/assessments/${id}` }} className={'underlined'}>
                     {`${formattedEventDate} CANS`}
                   </Link>
                 </Col>

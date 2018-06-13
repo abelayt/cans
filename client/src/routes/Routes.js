@@ -7,7 +7,7 @@ class Routes extends Component {
   render() {
     return (
       <Switch>
-        <Route path="/assessments/:id?" component={Assessment} />
+        <Route exact path="/clients/:childId/assessments/:id?" component={Assessment} />
         <Route exact path="/clients/new" component={ChildForm} />
         <Route path="/clients/:id" component={Client} />
         <Route exact path="/" component={ClientsContainer} />

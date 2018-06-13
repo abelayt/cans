@@ -17,7 +17,7 @@ import { ChildForm } from "../components/ChildForm";
  */
 
 it('navigates to assessments', () => {
-  executeTest(Assessment, '/assessments', 'COMMUNIMETRIC');
+  executeTest(Assessment, '/assessments', 'Communimetric');
 });
 
 it('navigates to clients list page', () => {

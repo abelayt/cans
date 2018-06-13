@@ -15,6 +15,16 @@ describe('person.helper', () => {
   });
 });
 
+export const childInfoJson = {
+  case_id: '1234',
+  county: { id: 5, name: 'Calaveras', external_id: '1072', export_id: '05' },
+  dob: '2014-01-28',
+  first_name: 'Test',
+  id: 10,
+  last_name: 'Child',
+  person_role: 'CLIENT',
+};
+
 export const personsJson = [
   {
     id: 1,

@@ -12,6 +12,7 @@ import AssessmentService from '../Assessment/Assessment.service';
 
 const assessmentInProgress = {
   id: 97501,
+  person: {id:1},
   status: 'IN_PROGRESS',
   event_date: '2015-10-10',
   updated_timestamp: '2015-06-06T15:37:32.000Z',
@@ -23,6 +24,7 @@ const assessmentInProgress = {
 
 const assessmentSubmitted = {
   id: 97502,
+  person: {id:1},
   status: 'SUBMITTED',
   event_date: '2018-01-05',
   updated_timestamp: '2018-06-06T15:37:32.000Z',
@@ -34,6 +36,7 @@ const assessmentSubmitted = {
 
 const assessmentWithNoUpdateInfo = {
   id: 97503,
+  person: {id:1},
   status: 'IN_PROGRESS',
   event_date: '2018-01-05',
   created_timestamp: '2018-06-06T15:37:32.000Z',
@@ -83,7 +86,7 @@ describe('<ClientAssessmentHistory', () => {
           <ClientAssessmentHistory clientId={1004} />
         </MemoryRouter>
       ).find(CardHeader);
-      expect(wrapper.props().action.props.to.pathname).toBe('/assessments');
+      expect(wrapper.props().action.props.to.pathname).toBe('/clients/1004/assessments');
     });
   });
 

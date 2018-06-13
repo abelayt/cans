@@ -13,81 +13,84 @@ import { getI18nByCode } from './I18nHelper';
 import { clone } from 'lodash';
 import AssessmentFormFooter from './AssessmentFormFooter';
 import { PageInfo } from '../Layout';
+import { PersonService } from '../Client/';
+import { LoadingState } from '../../util/loadingHelper';
+import { AssessmentStatus, AssessmentType } from './AssessmentHelper';
+import { DateTime } from 'luxon';
 
 class Assessment extends Component {
   constructor(props) {
     super(props);
     this.state = {
       assessment: {},
-      assessment_status: 'idle',
+      assessment_status: LoadingState.idle,
       i18n: {},
-      i18n_status: 'idle',
+      i18n_status: LoadingState.idle,
+      child: {},
     };
   }
 
   componentDidMount() {
     const assessmentId = this.props.match.params.id;
-    if (assessmentId) {
-      this.fetchAssessment(assessmentId);
-    } else {
-      this.fetchNewAssessment();
-    }
+    PersonService.fetch(this.props.match.params.childId)
+      .then(response => this.setState({ child: response }))
+      .catch(() => this.setState({ child: {} }));
+    assessmentId
+      ? this.fetchAssessment(assessmentId)
+      : this.fetchNewAssessment();
   }
 
   fetchNewAssessment() {
-    this.setState({ assessment_status: 'waiting' });
+    this.setState({ assessment_status: LoadingState.waiting });
     return AssessmentService.fetchNewAssessment()
       .then(this.onFetchNewAssessmentSuccess)
-      .catch(() => this.setState({ assessment_status: 'error' }));
+      .catch(() => this.setState({ assessment_status: LoadingState.error }));
   }
 
   onFetchNewAssessmentSuccess = instrument => {
+    const assessment = {
+      instrument_id: 1,
+      person: this.state.child,
+      assessment_type: AssessmentType.initial,
+      status: AssessmentStatus.inProgress,
+      state: instrument.prototype,
+      event_date: DateTime.local().toISODate(),
+      completed_as: 'COMMUNIMETRIC',
+    };
     this.setState({
-      assessment: instrument,
-      assessment_status: 'ready',
-    });
-    this.fetchI18n(instrument.id);
-  };
-
-  fetchAssessment(id) {
-    this.setState({ assessment_status: 'waiting' });
-    return AssessmentService.fetch(id)
-      .then(this.onFetchAssessmentSuccess)
-      .catch(() => this.setState({ assessment_status: 'error' }));
-  };
-
-  onFetchAssessmentSuccess = assessment => {
-    this.setState({
-      assessment: assessment,
-      assessment_status: 'ready',
+      assessment,
+      assessment_status: LoadingState.ready,
     });
     this.fetchI18n(assessment.instrument_id);
   };
 
-  fetchI18n = instrumentId => {
-    this.setState({ i18n_status: 'waiting' });
+  fetchAssessment(id) {
+    this.setState({ assessment_status: LoadingState.waiting });
+    return AssessmentService.fetch(id)
+      .then(this.onFetchAssessmentSuccess)
+      .catch(() => this.setState({ assessment_status: LoadingState.error }));
+  }
+
+  onFetchAssessmentSuccess = assessment => {
+    this.setState({
+      assessment,
+      assessment_status: LoadingState.ready,
+    });
+    this.fetchI18n(assessment.instrument_id);
+  };
+
+  fetchI18n(instrumentId) {
+    this.setState({ i18n_status: LoadingState.waiting });
     return I18nService.fetchByInstrumentId(instrumentId)
       .then(this.onFetchI18nSuccess)
-      .catch(() => this.setState({ i18n_status: 'error' }));
-  };
+      .catch(() => this.setState({ i18n_status: LoadingState.error }));
+  }
 
   onFetchI18nSuccess = i18n => {
     this.setState({
       i18n: i18n,
-      i18n_status: 'ready',
+      i18n_status: LoadingState.ready,
     });
-  };
-
-  updateAssessment = assessment => {
-    this.setState({ assessment_status: 'updating' });
-    AssessmentService.update(assessment.id, assessment)
-      .then(updatedAssessment => {
-        this.setState({
-          assessment: updatedAssessment,
-          assessment_status: 'ready',
-        });
-      })
-      .catch(() => this.setState({ assessment_status: 'error' }));
   };
 
   handleUpdateItemRating = (code, rating) => {
@@ -96,6 +99,18 @@ class Assessment extends Component {
 
   handleUpdateItemConfidentiality = (code, isConfidential) => {
     this.updateAndStoreItem(code, 'confidential', isConfidential);
+  };
+
+  handleDateChange = (dateValue) => {
+    const assessment = this.state.assessment;
+    assessment.event_date = dateValue;
+    this.updateAssessment(assessment)
+  };
+
+  handleSelectCompletedAs = (completedAs) => {
+    const assessment = this.state.assessment;
+    assessment.completed_as = completedAs;
+    this.updateAssessment(assessment)
   };
 
   updateAndStoreItem = (itemCode, key, value) => {
@@ -117,28 +132,55 @@ class Assessment extends Component {
         });
       }
     });
-
     this.updateAssessment(updateAssessment);
   };
 
-  handleUnderSixStateNegate = onChangeEvent => {
-    const updateAssessment = clone(this.state.assessment);
-    const oldValue = onChangeEvent.target.value === 'true';
-    updateAssessment.state.under_six = !oldValue;
-    this.updateAssessment(updateAssessment);
+  updateAssessment(assessment) {
+    this.setState({
+      assessment,
+      assessment_status: LoadingState.ready,
+    });
+  }
+
+  initialSave(assessment) {
+    this.setState({ assessment });
+    this.updateUrlWithAssessment(assessment)
+  }
+
+  updateUrlWithAssessment(assessment) {
+    this.props.history.push(`/clients/${this.state.child.id}/assessments/${assessment.id}`);
+  }
+
+  handleSaveAssessment = () => {
+    const assessment = this.state.assessment;
+    if (assessment.id) {
+      AssessmentService.update(assessment.id, assessment)
+        .then((updatedAssessment) => {this.setState({ assessment: updatedAssessment })})
+        .catch(() => this.setState({ assessment_status: LoadingState.error }));
+    } else {
+      AssessmentService.postAssessment(assessment)
+        .then((updatedAssessment) => {this.initialSave(updatedAssessment)})
+        .catch(() => this.setState({ assessment_status: LoadingState.error }));
+    }
   };
 
-  renderDomains = domains => {
+  toggleUnderSix = () => {
+    const assessment = this.state.assessment;
+    assessment.state.under_six = !assessment.state.under_six;
+    this.setState({ assessment });
+  };
+
+  renderDomains(domains) {
     const i18n = this.state.i18n || {};
     const { under_six } = (this.state.assessment || {}).state || {};
-    return domains.map(child => {
-      const code = child.code;
-      const childI18n = getI18nByCode(i18n, code);
-      return child.class === 'domain' ? (
+    return domains.map(domain => {
+      const domainCode = domain.code;
+      const domainI18n = getI18nByCode(i18n, domainCode);
+      return domain.class === 'domain' ? (
         <Domain
-          key={code}
-          domain={child}
-          i18n={childI18n}
+          key={domainCode}
+          domain={domain}
+          i18n={domainI18n}
           i18nAll={i18n}
           assessmentUnderSix={under_six}
           onRatingUpdate={this.handleUpdateItemRating}
@@ -146,9 +188,9 @@ class Assessment extends Component {
         />
       ) : (
         <DomainsGroup
-          key={code}
-          domainsGroup={child}
-          i18n={childI18n}
+          key={domainCode}
+          domainsGroup={domain}
+          i18n={domainI18n}
           i18nAll={i18n}
           assessmentUnderSix={under_six}
           onRatingUpdate={this.handleUpdateItemRating}
@@ -156,20 +198,23 @@ class Assessment extends Component {
         />
       );
     });
-  };
+  }
 
-  render = () => {
-    const { clientFirstName, clientLastName } = this.props.location;
-    const assessmentState =
-      this.state.assessment.state || this.state.assessment.prototype || {};
+  render() {
+    const child = this.state.child;
+    const assessmentState = this.state.assessment.state || {};
     const isUnderSix = assessmentState.under_six || false;
     const domains = assessmentState.domains || [];
     return (
       <Fragment>
         <PageInfo title={'Add CANS'} />
         <AssessmentFormHeader
-          clientFirstName={clientFirstName}
-          clientLastName={clientLastName}
+          clientFirstName={child.first_name}
+          clientLastName={child.last_name}
+          onAssessmentDateChange={this.handleDateChange}
+          onAssessmentCompletedAsChange={this.handleSelectCompletedAs}
+          assessmentDate={this.state.assessment.event_date}
+          assessmentCompletedAs={this.state.assessment.completed_as}
         />
         <Typography variant="body1" style={{ textAlign: 'right' }}>
           Age: 0-5
@@ -178,7 +223,7 @@ class Assessment extends Component {
               <Switch
                 checked={!isUnderSix}
                 value={isUnderSix}
-                onChange={this.handleUnderSixStateNegate}
+                onChange={this.toggleUnderSix}
                 color="default"
               />
             }
@@ -187,7 +232,8 @@ class Assessment extends Component {
           />
         </Typography>
         {this.renderDomains(domains)}
-        <AssessmentFormFooter />
+        <AssessmentFormFooter handleSaveAssessment={this.handleSaveAssessment}
+                              assessmentDate={this.state.assessment.event_date}/>
       </Fragment>
     );
   };
