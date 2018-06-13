@@ -33,7 +33,7 @@ describe('Header', () => {
       const wrapper = await mount(<Header />);
       const displayedUserInitials = wrapper
         .find('.profile-avatar')
-      .text()
+        .text()
         .trim();
       expect(displayedUserInitials).toBe('JD');
     });
