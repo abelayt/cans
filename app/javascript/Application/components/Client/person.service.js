@@ -13,6 +13,9 @@ class PersonService {
       return response.data;
     });
   }
+  static postClient(clientId) {
+    return appApi.post(`/people`, clientId).then(response => response.data);
+  }
 }
 
 export default PersonService;

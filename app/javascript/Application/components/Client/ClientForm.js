@@ -5,7 +5,7 @@ import { withStyles } from '@material-ui/core/styles';
 import { MenuItem, TextField, Card, CardHeader, CardContent, CardActions, Button } from '@material-ui/core';
 import { Redirect } from 'react-router-dom';
 import { CountiesService } from '../ChildForm/Counties.service';
-import { ChildFormService } from '../ChildForm/ChildForm.service';
+import PersonService from './person.service';
 import { validate, isFormValid } from '../ChildForm/ChildForm.helper';
 import { PageInfo } from '../Layout/index';
 import { Notification } from '../Notification/index';
@@ -97,7 +97,7 @@ class ClientForm extends Component {
   handleSubmit = event => {
     event.preventDefault();
     this.setState({ child_status: 'updating' });
-    ChildFormService.createChild(this.state.childInfo)
+    PersonService.postClient(this.state.childInfo)
       .then(newChild => {
         this.setState({
           childInfo: newChild,

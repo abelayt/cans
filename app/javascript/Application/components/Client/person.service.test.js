@@ -36,4 +36,22 @@ describe('PersonService', () => {
       });
     });
   });
+
+  describe('#createClient', () => {
+    const apiGetSpy = jest.spyOn(appApi, 'post');
+
+    beforeEach(() => {
+      apiGetSpy.mockReset();
+    });
+
+    it('posts ClientInfo Object', async () => {
+      const expectedChildForm = { id: 1, first_name: 'sam' };
+      apiGetSpy.mockReturnValue(Promise.resolve({ data: expectedChildForm }));
+      const clientInfo = 1;
+      const actualChildForm = await PersonService.postClient(clientInfo);
+      expect(actualChildForm).toBe(expectedChildForm);
+      expect(apiGetSpy).toHaveBeenCalledTimes(1);
+      expect(apiGetSpy).toHaveBeenCalledWith(`/people`, 1);
+    });
+  });
 });
