@@ -4,11 +4,11 @@ import InputMask from 'react-input-mask';
 import { withStyles } from '@material-ui/core/styles';
 import { MenuItem, TextField, Card, CardHeader, CardContent, CardActions, Button } from '@material-ui/core';
 import { Redirect } from 'react-router-dom';
-import { CountiesService } from './Counties.service';
-import { ChildFormService } from './ChildForm.service';
-import { validate, isFormValid } from './ChildForm.helper';
-import { PageInfo } from '../Layout';
-import { Notification } from '../Notification';
+import { CountiesService } from '../ChildForm/Counties.service';
+import { ChildFormService } from '../ChildForm/ChildForm.service';
+import { validate, isFormValid } from '../ChildForm/ChildForm.helper';
+import { PageInfo } from '../Layout/index';
+import { Notification } from '../Notification/index';
 
 const styles = theme => ({
   container: {
@@ -43,7 +43,7 @@ const styles = theme => ({
   },
 });
 
-class ChildForm extends Component {
+class ClientForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -292,8 +292,8 @@ class ChildForm extends Component {
   }
 }
 
-ChildForm.propTypes = {
+ClientForm.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(ChildForm);
+export default withStyles(styles)(ClientForm);
