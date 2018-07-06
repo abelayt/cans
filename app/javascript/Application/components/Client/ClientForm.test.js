@@ -1,6 +1,6 @@
 import React from 'react';
 import { mount, shallow } from 'enzyme';
-import ClientForm from './ClientForm';
+import { ClientForm } from './';
 
 describe('<ClientForm />', () => {
   const getWrapper = () => shallow(<ClientForm />);
