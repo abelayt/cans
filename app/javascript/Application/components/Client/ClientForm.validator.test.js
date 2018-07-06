@@ -1,4 +1,4 @@
-import { validate, isFormValid } from './ChildForm.helper';
+import { validate, isFormValid } from './ClientForm.validator';
 
 describe('ChildForm.helper', () => {
   describe('#validate()', () => {

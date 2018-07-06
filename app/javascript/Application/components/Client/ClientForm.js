@@ -6,7 +6,7 @@ import { MenuItem, TextField, Card, CardHeader, CardContent, CardActions, Button
 import { Redirect } from 'react-router-dom';
 import { CountiesService } from '../ChildForm/Counties.service';
 import PersonService from './person.service';
-import { validate, isFormValid } from '../ChildForm/ChildForm.helper';
+import { validate, isFormValid } from './ClientForm.validator';
 import { PageInfo } from '../Layout/index';
 import { Notification } from '../Notification/index';
 
@@ -146,7 +146,7 @@ class ClientForm extends Component {
 
   validateInput = (fieldName, inputValue) => {
     const fieldValidation = validate(fieldName, inputValue);
-    const allValidations = this.state.childInfoValidation;
+    const allValidations = Object.assign({}, this.state.childInfoValidation);
     allValidations[fieldName] = fieldValidation;
     const formValidation = isFormValid(allValidations);
     this.setState({

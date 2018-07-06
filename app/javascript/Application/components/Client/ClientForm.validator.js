@@ -7,7 +7,7 @@ export function validate(fieldName, value) {
     case 'case_id':
       return value.length && /^[a-zA-Z0-9]+$/i.test(value);
     case 'external_id':
-      return value.length > 18 && (/^\d{4}-\d{4}-\d{4}-\d{7}$/i.test(value) || /^\d{19}$/i.test(value));
+      return value.length > 18 && /^\d{4}-\d{4}-\d{4}-\d{7}$/i.test(value);
     case 'dob':
       return !!value;
     case 'county':
