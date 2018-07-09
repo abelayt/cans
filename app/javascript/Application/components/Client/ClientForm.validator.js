@@ -1,7 +1,6 @@
 export function validate(fieldName, value) {
   switch (fieldName) {
     case 'first_name':
-      return value.length && /^[A-z]+(([ ]|[-])[A-z]+)?$/i.test(value);
     case 'last_name':
       return value.length && /^[A-z]+(([ ]|[-])[A-z]+)?$/i.test(value);
     case 'case_id':
