@@ -19,6 +19,7 @@ services:
       PERRY_PORT: ${PERRY_PORT}
       DEV_MODE: ${DEV_MODE}
       LOG_LEVEL: ${LOG_LEVEL}
+
   redis:
     image: 'redis:3.0'
     ports:

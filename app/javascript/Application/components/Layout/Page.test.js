@@ -1,28 +1,23 @@
 import React from 'react';
-import { mount } from 'enzyme';
-import { MemoryRouter } from 'react-router-dom';
-import { SideNav } from './SideNav';
-import { Page } from './index';
+import { shallow } from 'enzyme';
+import { Page, SideNav } from './';
 import { Routes } from '../../routes';
 
 describe('<Page />', () => {
-  const getWrapper = () =>
-    mount(
-      <MemoryRouter>
-        <Page />
-      </MemoryRouter>
-    );
+  describe('layout', () => {
+    const getWrapper = () => shallow(<Page />);
 
-  /* eslint-disable jasmine/no-disabled-tests */
-  xit('renders with <SideNav /> links', () => {
-    const page = getWrapper();
-    expect(page.find({ text: 'Reports' }).length).toBe(1); // this works
-    expect(page.find(SideNav).length).toBe(1); // this does not
-  });
-  /* eslint-enable jasmine/no-disabled-tests */
+    it('renders with <SideNav /> links', () => {
+      const wrapper = getWrapper();
+      const sideNav = wrapper.find(SideNav);
 
-  it('renders with <Routes /> component', () => {
-    const page = getWrapper();
-    expect(page.find(Routes).length).toBe(1);
+      expect(sideNav.length).toBe(1);
+      expect(sideNav.dive().find({ text: 'Reports' }).length).toBe(1);
+    });
+
+    it('renders with <Routes /> component', () => {
+      const wrapper = getWrapper();
+      expect(wrapper.find(Routes).length).toBe(1);
+    });
   });
 });

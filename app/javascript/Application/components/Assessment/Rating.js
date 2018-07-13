@@ -20,9 +20,7 @@ class Rating extends Component {
   };
 
   handleChange = onChangeEvent => {
-    const code = this.props.itemCode;
-    const newValue = onChangeEvent.target.value;
-    this.props.onRatingUpdate(code, newValue);
+    this.props.onRatingUpdate(onChangeEvent);
   };
 
   renderNaOptionIfNeeded = () => {

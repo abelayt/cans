@@ -32,13 +32,21 @@ export const assessment = {
   completed_as: 'COMMUNIMETRIC',
   can_release_confidential_info: false,
   state: {
-    id: 0,
     under_six: false,
+    caregiver_domain_template: {
+      id: '6',
+      code: 'CGV',
+      is_caregiver_domain: true,
+      items: [
+        {
+          code: '1',
+        },
+      ],
+    },
     domains: [
       {
         id: 0,
         code: '123',
-        class: 'domain',
         items: [
           {
             above_six_id: '1',
@@ -81,8 +89,8 @@ export const assessment = {
             under_six_id: 'EC01',
           },
         ],
-        underSix: false,
-        aboveSix: false,
+        underSix: true,
+        aboveSix: true,
       },
     ],
   },

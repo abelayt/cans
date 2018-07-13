@@ -146,13 +146,13 @@ class AssessmentContainer extends Component {
     } else {
       AssessmentService.postAssessment(assessment)
         .then(submittedAssessment => {
+          this.updateUrlWithAssessment(submittedAssessment);
           this.setState({
             redirection: {
               shouldRedirect: true,
               successAssessmentId: submittedAssessment.id,
             },
           });
-          this.updateUrlWithAssessment(submittedAssessment);
         })
         .catch(() => this.setState({ assessment_status: LoadingState.error }));
     }

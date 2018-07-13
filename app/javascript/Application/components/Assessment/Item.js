@@ -33,6 +33,7 @@ class Item extends Component {
 
   static propTypes = {
     item: PropTypes.object.isRequired,
+    caregiverIndex: PropTypes.string,
     i18n: PropTypes.object.isRequired,
     assessmentUnderSix: PropTypes.bool.isRequired,
     canReleaseConfidentialInfo: PropTypes.bool.isRequired,
@@ -62,14 +63,16 @@ class Item extends Component {
 
   handleRatingChange = onChangeEvent => {
     const code = this.props.item.code;
+    const caregiverIndex = this.props.caregiverIndex;
     const newValue = parseInt(onChangeEvent.target.value);
-    this.props.onRatingUpdate(code, newValue);
+    this.props.onRatingUpdate(code, newValue, caregiverIndex);
   };
 
   handleConfidentialityChange = onChangeEvent => {
     const code = this.props.item.code;
+    const caregiverIndex = this.props.caregiverIndex;
     const oldValue = onChangeEvent.target.value === 'true';
-    this.props.onConfidentialityUpdate(code, !oldValue);
+    this.props.onConfidentialityUpdate(code, !oldValue, caregiverIndex);
   };
 
   switchExpandedState = () => {
@@ -154,7 +157,7 @@ class Item extends Component {
   };
 
   render = () => {
-    const { item, assessmentUnderSix, onRatingUpdate } = this.props;
+    const { item, assessmentUnderSix, caregiverIndex } = this.props;
     const {
       code,
       rating_type,
@@ -182,7 +185,8 @@ class Item extends Component {
               onKeyDown={this.switchExpandedState}
             />
             <Typography variant="title">
-              {itemNumber}. {title}
+              {itemNumber}
+              {caregiverIndex}. {title}
             </Typography>
             {this.renderConfidentialCheckbox(isConfidential, confidential_by_default)}
             <Rating
@@ -190,7 +194,7 @@ class Item extends Component {
               rating_type={rating_type}
               hasNaOption={has_na_option}
               rating={rating}
-              onRatingUpdate={onRatingUpdate}
+              onRatingUpdate={this.handleRatingChange}
             />
           </Toolbar>
         </AppBar>

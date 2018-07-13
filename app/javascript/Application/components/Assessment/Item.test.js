@@ -88,6 +88,16 @@ describe('<Item />', () => {
     );
   });
 
+  it('renders caregiver index if it exists', async () => {
+    const wrapper = mount({ ...itemComponentDefault });
+    wrapper.setProps({
+      ...propsDefault,
+      caregiverIndex: 'a',
+    });
+    const foldedText = wrapper.text();
+    expect(foldedText).toMatch(/1a\. /);
+  });
+
   describe('N/A option', () => {
     it('can have N/A option', () => {
       const item = { ...itemDefault };
@@ -191,7 +201,7 @@ describe('<Item />', () => {
       wrapper.instance().handleRatingChange(stringValue);
 
       // the string "1" was converted to a 1
-      expect(onRatingUpdateMock).toBeCalledWith('lf10family', 1);
+      expect(onRatingUpdateMock).toBeCalledWith('lf10family', 1, undefined);
     });
   });
 

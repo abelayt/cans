@@ -249,17 +249,25 @@ describe('<AssessmentContainer />', () => {
       });
 
       it('redirects to client page on Submit button clicked', async () => {
+        // given
         const assessmentServicePostSpy = jest.spyOn(AssessmentService, 'postAssessment');
         assessmentServicePostSpy.mockReturnValue(Promise.resolve({ id: 123 }));
-        const wrapper = await mountWithRouter(<AssessmentContainer match={{ params: { id: 1 } }} />);
+        const historyArray = [];
+        const wrapper = await mountWithRouter(
+          <AssessmentContainer match={{ params: { id: 1 } }} history={historyArray} />
+        );
         expect(wrapper.find('Redirect').length).toBe(0);
-        await wrapper
-          .find('AssessmentContainer')
-          .instance()
-          .handleSubmitAssessment();
-        const redirect = wrapper.update().find('Redirect');
+
+        // when
+        const instance = wrapper.find('AssessmentContainer').instance();
+        await instance.handleSubmitAssessment();
+
+        // then
+        await wrapper.update();
+        const redirect = wrapper.find('Redirect');
         expect(redirect.length).toBe(1);
         expect(redirect.first().props().to.state.successAssessmentId).toBe(123);
+        expect(historyArray.length).toBe(1);
       });
     });
   });

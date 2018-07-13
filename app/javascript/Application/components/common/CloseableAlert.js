@@ -21,8 +21,8 @@ export class CloseableAlert extends Component {
   }
 
   static propTypes = {
-    type: PropTypes.oneOf([alertType.SUCCESS, alertType.INFO, alertType.WARNING, alertType.DANGER]).required,
-    message: PropTypes.object.required,
+    type: PropTypes.oneOf([alertType.SUCCESS, alertType.INFO, alertType.WARNING, alertType.DANGER]).isRequired,
+    message: PropTypes.oneOfType([PropTypes.object, PropTypes.string]).isRequired,
     isCloseable: PropTypes.bool,
     isAutoCloseable: PropTypes.bool,
   };
