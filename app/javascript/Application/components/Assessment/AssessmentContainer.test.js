@@ -9,6 +9,7 @@ import AssessmentFormFooter from './AssessmentFormFooter';
 import { MemoryRouter } from 'react-router-dom';
 import { assessment, updatedAssessment, initialAssessment, instrument } from './assessment.mocks.test';
 import { DateTime } from 'luxon';
+import { LoadingState } from '../../util/loadingHelper';
 
 const defaultProps = {
   location: { childId: 1 },
@@ -48,7 +49,6 @@ describe('<AssessmentContainer />', () => {
       it('will load client data', async () => {
         const props = {
           location: { childId: 10 },
-          match: { params: { id: undefined } },
         };
         const personServiceFetchSpy = jest.spyOn(PersonService, 'fetch');
         personServiceFetchSpy.mockReturnValue(Promise.resolve(childInfoJson));
@@ -61,7 +61,6 @@ describe('<AssessmentContainer />', () => {
     describe('assessment form with no existing assessment', () => {
       const props = {
         location: { childId: 1 },
-        match: { params: { id: undefined } },
       };
 
       it('calls fetchNewAssessment', () => {
@@ -223,11 +222,14 @@ describe('<AssessmentContainer />', () => {
 
     describe('Submit button', () => {
       it('is disabled/enabled based on the assessment validity', async () => {
-        const wrapper = await mountWithRouter(<AssessmentContainer match={{ params: { id: 1 } }} />);
+        const wrapper = await mountWithRouter(<AssessmentContainer match={{ params: { childId: 123 } }} />);
         await wrapper
           .find('AssessmentContainer')
           .instance()
-          .setState({ isValidForSubmit: false });
+          .setState({
+            isValidForSubmit: false,
+            assessmentServiceStatus: LoadingState.ready,
+          });
         wrapper.update();
         expect(
           wrapper
@@ -238,7 +240,10 @@ describe('<AssessmentContainer />', () => {
         await wrapper
           .find('AssessmentContainer')
           .instance()
-          .setState({ isValidForSubmit: true });
+          .setState({
+            isValidForSubmit: true,
+            assessmentServiceStatus: LoadingState.ready,
+          });
         wrapper.update();
         expect(
           wrapper
@@ -268,6 +273,42 @@ describe('<AssessmentContainer />', () => {
         expect(redirect.length).toBe(1);
         expect(redirect.first().props().to.state.successAssessmentId).toBe(123);
         expect(historyArray.length).toBe(1);
+      });
+    });
+
+    describe('submit and save buttons', () => {
+      it('should disable buttons when assessment service is working', async () => {
+        const wrapper = await mountWithRouter(<AssessmentContainer />);
+
+        // when
+        wrapper
+          .find('AssessmentContainer')
+          .instance()
+          .setState({
+            isValidForSubmit: true,
+            assessmentServiceStatus: LoadingState.waiting,
+          });
+
+        // then
+        expect(wrapper.find('Button#save-assessment').instance().props.disabled).toBeTruthy();
+        expect(wrapper.find('Button#submit-assessment').instance().props.disabled).toBeTruthy();
+      });
+
+      it('should enable buttons when assessment service is not working', async () => {
+        const wrapper = await mountWithRouter(<AssessmentContainer />);
+
+        // when
+        wrapper
+          .find('AssessmentContainer')
+          .instance()
+          .setState({
+            isValidForSubmit: true,
+            assessmentServiceStatus: LoadingState.ready,
+          });
+
+        // then
+        expect(wrapper.find('Button#save-assessment').instance().props.disabled).toBeFalsy();
+        expect(wrapper.find('Button#submit-assessment').instance().props.disabled).toBeFalsy();
       });
     });
   });

@@ -80,6 +80,28 @@ describe('<Assessment />', () => {
     });
   });
 
+  describe('#updateCaregiverName()', () => {
+    describe('onUpdateAssessment call back', () => {
+      it('is invoked when caregiver name is updated', () => {
+        // given
+        const mockFn = jest.fn();
+        const initialAssessment = cloneDeep(assessment);
+        initialAssessment.state.domains[0] = enhanceDomainToCaregiver(initialAssessment.state.domains[0]);
+        const wrapper = mount(<Assessment onAssessmentUpdate={mockFn} assessment={initialAssessment} i18n={i18n} />);
+        expect(initialAssessment.state.domains[0].caregiver_name).toBeUndefined();
+
+        // when
+        wrapper.instance().updateCaregiverName('a', 'New Name');
+
+        // then
+        const updatedAssessment = cloneDeep(assessment);
+        updatedAssessment.state.domains[0] = enhanceDomainToCaregiver(updatedAssessment.state.domains[0]);
+        updatedAssessment.state.domains[0].caregiver_name = 'New Name';
+        expect(mockFn).toHaveBeenCalledWith(updatedAssessment);
+      });
+    });
+  });
+
   describe('caregiver domain', () => {
     it('adds caregiver domain', () => {
       // given

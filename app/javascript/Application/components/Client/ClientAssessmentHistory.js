@@ -30,6 +30,9 @@ class ClientAssessmentHistory extends Component {
   constructor(context) {
     super(context);
     const { successAssessmentId } = (this.props.location || {}).state || {};
+    if (successAssessmentId && this.props.history) {
+      this.props.history.replace({ ...this.props.location, state: {} });
+    }
     this.state = {
       clientId: null,
       assessments: [],
@@ -38,20 +41,12 @@ class ClientAssessmentHistory extends Component {
     };
   }
 
-  static propTypes = {
-    /** Id of the client */
-    clientId: PropTypes.number,
-    /** React-router location object */
-    location: PropTypes.object,
-  };
-
   UNSAFE_componentWillReceiveProps(nextProps) {
     const { clientId } = nextProps;
-    if (!clientId) {
-      return;
+    if (clientId) {
+      this.setState({ clientId });
+      this.searchAssessments(clientId);
     }
-    this.setState({ clientId });
-    this.searchAssessments(clientId);
   }
 
   searchAssessments(clientId) {
@@ -155,5 +150,11 @@ class ClientAssessmentHistory extends Component {
   }
 }
 /* eslint-enable camelcase */
+
+ClientAssessmentHistory.propTypes = {
+  clientId: PropTypes.number,
+  location: PropTypes.object,
+  history: PropTypes.object,
+};
 
 export default ClientAssessmentHistory;

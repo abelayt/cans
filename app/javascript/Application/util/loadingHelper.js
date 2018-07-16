@@ -5,3 +5,7 @@ export const LoadingState = Object.freeze({
   updating: 'UPDATING',
   waiting: 'WAITING',
 });
+
+export function isReadyForAction(status) {
+  return LoadingState.idle === status || LoadingState.ready === status;
+}

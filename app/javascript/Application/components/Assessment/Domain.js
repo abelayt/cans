@@ -7,26 +7,28 @@ import Typography from '@material-ui/core/Typography';
 import Tooltip from '@material-ui/core/Tooltip';
 import Divider from '@material-ui/core/Divider';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import { Input } from 'reactstrap';
 import { Item } from './';
 import { getI18nByCode } from './I18nHelper';
 import { isA11yAllowedInput } from '../../util/events';
 
 import './style.sass';
 
-const initI18nValue = i18n => ({
-  title: (i18n['_title_'] || '').toUpperCase(),
-  description: i18n['_description_'] || 'No Description',
+const mapPropsToState = props => ({
+  title: (props.i18n['_title_'] || '').toUpperCase(),
+  description: props.i18n['_description_'] || 'No Description',
+  caregiverName: props.domain.caregiver_name,
 });
 
 /* eslint-disable camelcase */
 class Domain extends Component {
   constructor(props) {
     super(props);
-    this.state = initI18nValue(props.i18n);
+    this.state = mapPropsToState(props);
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
-    this.setState(initI18nValue(nextProps.i18n));
+    this.setState(mapPropsToState(nextProps));
   }
 
   renderItems = items => {
@@ -72,6 +74,30 @@ class Domain extends Component {
     }
   };
 
+  handleInternalCaregiverNameUpdate = event => {
+    this.setState({ caregiverName: event.target.value });
+  };
+
+  handleCaregiverNameUpdate = () => {
+    this.props.onCaregiverNameUpdate(this.props.domain.caregiver_index, this.state.caregiverName);
+  };
+
+  renderCaregiverName = () => {
+    return (
+      <div className={'caregiver-name-wrapper'}>
+        <Input
+          bsSize="lg"
+          placeholder="Caregiver Name"
+          className={'caregiver-name'}
+          value={this.state.caregiverName}
+          maxLength={50}
+          onChange={this.handleInternalCaregiverNameUpdate}
+          onBlur={this.handleCaregiverNameUpdate}
+        />
+      </div>
+    );
+  };
+
   renderCaregiverDomainControls() {
     return (
       <div className={'caregiver-domain-controls'}>
@@ -107,8 +133,8 @@ class Domain extends Component {
 
   render = () => {
     const { assessmentUnderSix } = this.props;
-    const { items, under_six, above_six, is_caregiver_domain, caregiver_index } = this.props.domain;
-    const { title, description } = this.state;
+    const { items, under_six, above_six, is_caregiver_domain } = this.props.domain;
+    const { title, description, caregiverName } = this.state;
     return (assessmentUnderSix && under_six) || (!assessmentUnderSix && above_six) ? (
       <ExpansionPanel style={{ backgroundColor: '#114161' }}>
         <ExpansionPanelSummary
@@ -116,7 +142,7 @@ class Domain extends Component {
           style={{ minHeight: '28px' }}
         >
           <Typography variant="title" style={{ color: 'white' }}>
-            {title} {caregiver_index && `- ${caregiver_index.toUpperCase()}`}
+            {title} {caregiverName && `- ${caregiverName}`}
           </Typography>
           {description ? (
             <Tooltip title={description} placement="top-end" classes={{ popper: 'domain-tooltip' }}>
@@ -125,6 +151,7 @@ class Domain extends Component {
           ) : null}
         </ExpansionPanelSummary>
         <ExpansionPanelDetails style={{ display: 'block', padding: '0', backgroundColor: 'white' }}>
+          {is_caregiver_domain && this.renderCaregiverName()}
           {this.renderItems(items)}
           {is_caregiver_domain && this.renderCaregiverDomainControls()}
         </ExpansionPanelDetails>
@@ -144,6 +171,7 @@ Domain.propTypes = {
   onConfidentialityUpdate: PropTypes.func.isRequired,
   onAddCaregiverDomain: PropTypes.func.isRequired,
   onRemoveCaregiverDomain: PropTypes.func.isRequired,
+  onCaregiverNameUpdate: PropTypes.func.isRequired,
 };
 
 Domain.defaultProps = {

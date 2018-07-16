@@ -6,7 +6,7 @@ import Typography from '@material-ui/core/Typography';
 import { clone } from 'lodash';
 import { PageInfo } from '../Layout';
 import { PersonService } from '../Client/';
-import { LoadingState } from '../../util/loadingHelper';
+import { LoadingState, isReadyForAction } from '../../util/loadingHelper';
 import {
   AssessmentStatus,
   AssessmentType,
@@ -21,7 +21,7 @@ class AssessmentContainer extends Component {
     super(props);
     this.state = {
       assessment: defaultEmptyAssessment,
-      assessment_status: LoadingState.idle,
+      assessmentServiceStatus: LoadingState.idle,
       i18n: {},
       i18n_status: LoadingState.idle,
       child: {},
@@ -42,10 +42,10 @@ class AssessmentContainer extends Component {
   }
 
   fetchNewAssessment() {
-    this.setState({ assessment_status: LoadingState.waiting });
+    this.setState({ assessmentServiceStatus: LoadingState.waiting });
     return AssessmentService.fetchNewAssessment()
       .then(this.onFetchNewAssessmentSuccess)
-      .catch(() => this.setState({ assessment_status: LoadingState.error }));
+      .catch(() => this.setState({ assessmentServiceStatus: LoadingState.error }));
   }
 
   onFetchNewAssessmentSuccess = instrument => {
@@ -61,16 +61,16 @@ class AssessmentContainer extends Component {
     };
     this.setState({
       assessment,
-      assessment_status: LoadingState.ready,
+      assessmentServiceStatus: LoadingState.ready,
     });
     this.fetchI18n(assessment.instrument_id);
   };
 
   fetchAssessment(id) {
-    this.setState({ assessment_status: LoadingState.waiting });
+    this.setState({ assessmentServiceStatus: LoadingState.waiting });
     return AssessmentService.fetch(id)
       .then(this.onFetchAssessmentSuccess)
-      .catch(() => this.setState({ assessment_status: LoadingState.error }));
+      .catch(() => this.setState({ assessmentServiceStatus: LoadingState.error }));
   }
 
   onFetchAssessmentSuccess = assessment => {
@@ -96,13 +96,16 @@ class AssessmentContainer extends Component {
     const isValidForSubmit = validateAssessmentForSubmit(assessment);
     this.setState({
       assessment,
-      assessment_status: LoadingState.ready,
+      assessmentServiceStatus: LoadingState.ready,
       isValidForSubmit,
     });
   };
 
   initialSave(assessment) {
-    this.setState({ assessment });
+    this.setState({
+      assessment,
+      assessmentServiceStatus: LoadingState.ready,
+    });
     this.updateUrlWithAssessment(assessment);
   }
 
@@ -111,24 +114,29 @@ class AssessmentContainer extends Component {
   }
 
   handleSaveAssessment = () => {
+    this.setState({ assessmentServiceStatus: LoadingState.updating });
     const assessment = this.state.assessment;
     assessment.person = this.state.child;
     if (assessment.id) {
       AssessmentService.update(assessment.id, assessment)
         .then(updatedAssessment => {
-          this.setState({ assessment: updatedAssessment });
+          this.setState({
+            assessment: updatedAssessment,
+            assessmentServiceStatus: LoadingState.ready,
+          });
         })
-        .catch(() => this.setState({ assessment_status: LoadingState.error }));
+        .catch(() => this.setState({ assessmentServiceStatus: LoadingState.error }));
     } else {
       AssessmentService.postAssessment(assessment)
         .then(updatedAssessment => {
           this.initialSave(updatedAssessment);
         })
-        .catch(() => this.setState({ assessment_status: LoadingState.error }));
+        .catch(() => this.setState({ assessmentServiceStatus: LoadingState.error }));
     }
   };
 
   handleSubmitAssessment = () => {
+    this.setState({ assessmentServiceStatus: LoadingState.updating });
     const assessment = clone(this.state.assessment);
     assessment.status = AssessmentStatus.submitted;
     assessment.person = this.state.child;
@@ -136,25 +144,27 @@ class AssessmentContainer extends Component {
       AssessmentService.update(assessment.id, assessment)
         .then(submittedAssessment => {
           this.setState({
+            assessmentServiceStatus: LoadingState.ready,
             redirection: {
               shouldRedirect: true,
               successAssessmentId: submittedAssessment.id,
             },
           });
         })
-        .catch(() => this.setState({ assessment_status: LoadingState.error }));
+        .catch(() => this.setState({ assessmentServiceStatus: LoadingState.error }));
     } else {
       AssessmentService.postAssessment(assessment)
         .then(submittedAssessment => {
           this.updateUrlWithAssessment(submittedAssessment);
           this.setState({
+            assessmentServiceStatus: LoadingState.ready,
             redirection: {
               shouldRedirect: true,
               successAssessmentId: submittedAssessment.id,
             },
           });
         })
-        .catch(() => this.setState({ assessment_status: LoadingState.error }));
+        .catch(() => this.setState({ assessmentServiceStatus: LoadingState.error }));
     }
   };
 
@@ -167,11 +177,12 @@ class AssessmentContainer extends Component {
   };
 
   render() {
-    const { child, redirection, isValidForSubmit, assessment, i18n } = this.state;
+    const { child, redirection, isValidForSubmit, assessment, i18n, assessmentServiceStatus } = this.state;
     const { shouldRedirect, successAssessmentId } = redirection;
     if (shouldRedirect) {
       return <Redirect push to={{ pathname: `/clients/${child.id}`, state: { successAssessmentId } }} />;
     }
+    const canPerformUpdates = isReadyForAction(assessmentServiceStatus);
     return (
       <Fragment>
         <PageInfo title={'Add CANS'} />
@@ -183,9 +194,9 @@ class AssessmentContainer extends Component {
         </Typography>
         <AssessmentFormFooter
           onCancelClick={this.handleCancelClick}
-          saveButtonEnabled={!!this.state.assessment.event_date}
+          saveButtonEnabled={canPerformUpdates && !!this.state.assessment.event_date}
           onSaveAssessment={this.handleSaveAssessment}
-          submitButtonEnabled={isValidForSubmit}
+          submitButtonEnabled={canPerformUpdates && isValidForSubmit}
           onSubmitAssessment={this.handleSubmitAssessment}
         />
       </Fragment>
@@ -200,7 +211,9 @@ AssessmentContainer.propTypes = {
 };
 
 AssessmentContainer.defaultProps = {
-  match: {},
+  match: {
+    params: {},
+  },
   history: {},
 };
 

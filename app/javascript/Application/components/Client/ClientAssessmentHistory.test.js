@@ -176,6 +176,27 @@ describe('<ClientAssessmentHistory', () => {
         // then
         expect(history.find('CloseableAlert').length).toBe(0);
       });
+
+      it('is not rendered on page reload', () => {
+        // given
+        const browserHistory = [{ state: { successAssessmentId: 123 } }];
+        browserHistory.replace = function(newLocation) {
+          this.pop();
+          this.push(newLocation);
+        };
+
+        // when
+        const assessmentHistory1 = shallow(
+          <ClientAssessmentHistory clientId={1004} location={browserHistory[0]} history={browserHistory} />
+        );
+        expect(assessmentHistory1.find('CloseableAlert').length).toBe(1);
+        const assessmentHistory2 = shallow(
+          <ClientAssessmentHistory clientId={1004} location={browserHistory[0]} history={browserHistory} />
+        );
+
+        // then
+        expect(assessmentHistory2.find('CloseableAlert').length).toBe(0);
+      });
     });
   });
 });
