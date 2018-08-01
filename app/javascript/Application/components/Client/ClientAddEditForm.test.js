@@ -39,9 +39,9 @@ describe('<ClientAddEditForm />', () => {
       expect(addWrapper.state('childInfoValidation').first_name).toEqual(false);
       expect(addWrapper.state('childInfoValidation').last_name).toEqual(false);
       expect(addWrapper.state('childInfoValidation').dob).toEqual(false);
-      expect(addWrapper.state('childInfoValidation').case_id).toEqual(false);
       expect(addWrapper.state('childInfoValidation').external_id).toEqual(false);
       expect(addWrapper.state('childInfoValidation').county).toEqual(false);
+      expect(addWrapper.state('childInfoValidation').cases[0].external_id).toEqual(true);
       expect(addWrapper.state('isSaveButtonDisabled')).toEqual(true);
       expect(addWrapperMount.prop('title')).toBe('Add Child/Youth');
     });
@@ -59,9 +59,9 @@ describe('<ClientAddEditForm />', () => {
       expect(editWrapper.state('childInfoValidation').first_name).toEqual(true);
       expect(editWrapper.state('childInfoValidation').last_name).toEqual(true);
       expect(editWrapper.state('childInfoValidation').dob).toEqual(true);
-      expect(editWrapper.state('childInfoValidation').case_id).toEqual(true);
       expect(editWrapper.state('childInfoValidation').external_id).toEqual(true);
       expect(editWrapper.state('childInfoValidation').county).toEqual(true);
+      expect(editWrapper.state('childInfoValidation').cases[0].external_id).toEqual(true);
       expect(editWrapper.state('isSaveButtonDisabled')).toEqual(false);
       expect(editWrapperMount.prop('title')).toBe('Edit Child/Youth');
     });
@@ -96,16 +96,6 @@ describe('<ClientAddEditForm />', () => {
       expect(ClientEditWrapper.state('isSaveButtonDisabled')).toEqual(false);
     });
 
-    it('validates case_id', () => {
-      const wrapper = getWrapperEdit();
-      const ClientEditWrapper = wrapper.find('ClientAddEditForm').dive();
-      ClientEditWrapper.instance().handleChange('case_id')({
-        target: { value: '1234567890987654321' },
-      });
-      expect(ClientEditWrapper.state('childInfoValidation').case_id).toEqual(true);
-      expect(ClientEditWrapper.state('isSaveButtonDisabled')).toEqual(false);
-    });
-
     it('validates dob', () => {
       const wrapper = getWrapperEdit();
       const ClientEditWrapper = wrapper.find('ClientAddEditForm').dive();
@@ -126,6 +116,16 @@ describe('<ClientAddEditForm />', () => {
       expect(ClientEditWrapper.state('isSaveButtonDisabled')).toEqual(false);
     });
 
+    it('validates cases', () => {
+      const wrapper = getWrapperEdit();
+      const ClientEditWrapper = wrapper.find('ClientAddEditForm').dive();
+      ClientEditWrapper.instance().handleChangeCaseNumber(0)({
+        target: { value: '1234567890987654321' },
+      });
+      expect(ClientEditWrapper.state('childInfoValidation').cases[0].external_id).toEqual(true);
+      expect(ClientEditWrapper.state('isSaveButtonDisabled')).toEqual(false);
+    });
+
     it('enables Save button when all validations are good', () => {
       const wrapper = getWrapperEdit();
       const ClientEditWrapper = wrapper.find('ClientAddEditForm').dive();
@@ -135,9 +135,6 @@ describe('<ClientAddEditForm />', () => {
       });
       childFormInstance.handleChange('last_name')({
         target: { value: 'Max' },
-      });
-      childFormInstance.handleChange('case_id')({
-        target: { value: '1234567891234567890' },
       });
       childFormInstance.handleChange('external_id')({
         target: { value: '1234567891234567890' },
@@ -151,7 +148,99 @@ describe('<ClientAddEditForm />', () => {
       childFormInstance.handleChange('county')({
         target: { value: { id: '5' } },
       });
+      childFormInstance.handleChangeCaseNumber(0)({
+        target: { value: '123' },
+      });
       expect(ClientEditWrapper.state('isSaveButtonDisabled')).toEqual(false);
+    });
+  });
+
+  describe('case numbers', () => {
+    describe('#handleChangeCaseNumber()', () => {
+      it('should update case external_id and validate it', () => {
+        // given
+        const clientForm = getWrapperAdd()
+          .find('ClientAddEditForm')
+          .first()
+          .dive();
+
+        // when
+        clientForm.instance().handleChangeCaseNumber(0)({ target: { value: '1234' } });
+
+        // then
+        expect(clientForm.state().childInfo.cases[0].external_id).toEqual('1234');
+        expect(clientForm.state().childInfoValidation.cases[0].external_id).toBeTruthy();
+      });
+    });
+
+    describe('#onFetchChildDataSuccess()', () => {
+      it('should initialize validation object with cases', () => {
+        // given
+        const clientForm = getWrapperAdd()
+          .find('ClientAddEditForm')
+          .first()
+          .dive();
+
+        // when
+        clientForm.instance().onFetchChildDataSuccess({
+          cases: [{}, {}, {}],
+        });
+        clientForm.update();
+
+        // then
+        expect(clientForm.find('.case-numbers>TextField').length).toEqual(3);
+        const expectedCasesValidation = clientForm.state().childInfoValidation.cases;
+        expect(expectedCasesValidation.length).toEqual(3);
+        expect(expectedCasesValidation[0]).toEqual({ external_id: true });
+        expect(expectedCasesValidation[1]).toEqual({ external_id: true });
+        expect(expectedCasesValidation[2]).toEqual({ external_id: true });
+      });
+    });
+
+    describe('#handleAddCaseNumber()', () => {
+      it('should add new empty case number and update validation object with it', () => {
+        // given
+        const clientForm = getWrapperAdd()
+          .find('ClientAddEditForm')
+          .first()
+          .dive();
+
+        // when
+        clientForm.instance().handleAddCaseNumber({ type: 'click' });
+        clientForm.update();
+
+        // then
+        expect(clientForm.find('.case-numbers>TextField').length).toEqual(2);
+        const expectedCases = clientForm.state().childInfo.cases;
+        expect(expectedCases.length).toEqual(2);
+        expect(expectedCases[1]).toEqual({ external_id: '' });
+        const expectedCasesValidation = clientForm.state().childInfoValidation.cases;
+        expect(expectedCasesValidation.length).toEqual(2);
+        expect(expectedCasesValidation[1]).toEqual({ external_id: true });
+      });
+    });
+
+    describe('#prepareChildForSubmit()', () => {
+      it('should remove all cases with no external_id', () => {
+        // given
+        const inputChildInfo = {
+          cases: [{}, { external_id: '0' }, {}, { any: 'thing' }, { external_id: '1' }, {}],
+        };
+        const expectedChildInfo = {
+          cases: [{ external_id: '0' }, { external_id: '1' }],
+        };
+
+        // when
+        const actualChildInfo = getWrapperAdd()
+          .find('ClientAddEditForm')
+          .first()
+          .dive()
+          .instance()
+          .prepareChildForSubmit(inputChildInfo);
+
+        // then
+        expect(actualChildInfo).toEqual(expectedChildInfo);
+      });
     });
   });
 

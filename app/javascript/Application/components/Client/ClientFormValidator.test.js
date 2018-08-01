@@ -1,4 +1,4 @@
-import { validate, isFormValid } from './ClientFormValidator';
+import { validate, validateCaseNumber, isFormValid } from './ClientFormValidator';
 
 describe('ClientFormValidator', () => {
   describe('#validate()', () => {
@@ -26,14 +26,6 @@ describe('ClientFormValidator', () => {
       expect(validate('last_name', '   ')).toBe(false);
       expect(validate('last_name', 'Mike#')).toBe(false);
       expect(validate('last_name', '@')).toBe(false);
-    });
-
-    it('case_id', () => {
-      expect(validate('case_id', 'E76cv396')).toBe(true);
-      expect(validate('case_id', '76cv39d6')).toBe(true);
-      expect(validate('case_id', 'vgh7321 ')).toBe(false);
-      expect(validate('case_id', '#34la7sd')).toBe(false);
-      expect(validate('case_id', '   ')).toBe(false);
     });
 
     it('external_id', () => {
@@ -73,6 +65,26 @@ describe('ClientFormValidator', () => {
     });
   });
 
+  describe('#validateCaseNumber()', () => {
+    it('should return true for empty case numbers', () => {
+      expect(validateCaseNumber(undefined)).toBeTruthy();
+      expect(validateCaseNumber(null)).toBeTruthy();
+      expect(validateCaseNumber('')).toBeTruthy();
+    });
+
+    it('should return true for valid case numbers', () => {
+      expect(validateCaseNumber('a')).toBeTruthy();
+      expect(validateCaseNumber('abc')).toBeTruthy();
+      expect(validateCaseNumber('abcXYZ123')).toBeTruthy();
+    });
+
+    it('should return false for invalid case numbers', () => {
+      expect(validateCaseNumber('/')).toBeFalsy();
+      expect(validateCaseNumber('a%')).toBeFalsy();
+      expect(validateCaseNumber('123456789012345678901234567890123456789012345678901')).toBeFalsy();
+    });
+  });
+
   describe('#isFormValid()', () => {
     it('returns false when invalid', () => {
       expect(
@@ -80,9 +92,9 @@ describe('ClientFormValidator', () => {
           first_name: '',
           last_name: '',
           dob: '',
-          case_id: '',
           external_id: '',
           county: '',
+          cases: [],
         })
       ).toBe(false);
     });
@@ -93,9 +105,13 @@ describe('ClientFormValidator', () => {
           first_name: 'Amber',
           last_name: 'Jersey',
           dob: '10/12/2012',
-          case_id: '123',
           external_id: '1234567891234567890',
           county: { id: 1 },
+          cases: [
+            {
+              external_id: '123',
+            },
+          ],
         })
       ).toBe(true);
     });

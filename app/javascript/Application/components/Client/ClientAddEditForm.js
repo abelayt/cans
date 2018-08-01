@@ -6,8 +6,12 @@ import { MenuItem, TextField, Card, CardHeader, CardContent, CardActions, Button
 import { Redirect, Link } from 'react-router-dom';
 import { CountiesService } from './Counties.service';
 import { ClientService } from './Client.service';
-import { validate, isFormValid } from './ClientFormValidator';
+import { validate, validateCaseNumber, isFormValid } from './ClientFormValidator';
 import { PageInfo } from '../Layout';
+import { isA11yAllowedInput } from '../../util/events';
+import { clone } from '../../util/common';
+
+import './style.sass';
 
 const styles = theme => ({
   inputText: {
@@ -58,30 +62,37 @@ class ClientAddEditForm extends Component {
     super(props);
     const isNewForm = !this.props.match.params.id;
     this.state = {
-      isNewForm: isNewForm,
+      isNewForm,
       childInfo: {
         person_role: 'CLIENT',
         first_name: '',
         last_name: '',
         dob: '',
-        case_id: '',
         external_id: '',
         county: {
           id: 0,
           name: '',
         },
+        cases: [
+          {
+            external_id: '',
+          },
+        ],
       },
-      counties: [],
       childInfoValidation: {
         first_name: !isNewForm,
         last_name: !isNewForm,
         dob: !isNewForm,
-        case_id: !isNewForm,
         external_id: !isNewForm,
         county: !isNewForm,
+        cases: [
+          {
+            external_id: true,
+          },
+        ],
       },
+      counties: [],
       isSaveButtonDisabled: isNewForm,
-      open: false,
       redirection: {
         shouldRedirect: false,
         successClientId: null,
@@ -89,30 +100,11 @@ class ClientAddEditForm extends Component {
     };
   }
 
-  handleChange = name => event => {
-    const newValue = event.target.value;
-    this.setState({
-      childInfo: {
-        ...this.state.childInfo,
-        [name]: newValue,
-      },
-    });
-    this.validateInput(name, newValue);
-  };
-
-  handleClose = () => {
-    this.setState({ open: false });
-  };
-
-  handleOpen = () => {
-    this.setState({ open: true });
-  };
-
   componentDidMount() {
+    this.fetchCounties();
     if (!this.state.isNewForm) {
       this.fetchChildData(this.props.match.params.id);
     }
-    this.fetchCounties();
   }
 
   fetchChildData = id => {
@@ -121,8 +113,18 @@ class ClientAddEditForm extends Component {
       .catch(() => {});
   };
 
-  onFetchChildDataSuccess = data => {
-    this.setState({ childInfo: data });
+  onFetchChildDataSuccess = childInfo => {
+    const childInfoValidation = {
+      ...this.state.childInfoValidation,
+      cases: [],
+    };
+    for (let i = 0; i < childInfo.cases.length; i++) {
+      childInfoValidation.cases.push({ external_id: true });
+    }
+    this.setState({
+      childInfo,
+      childInfoValidation,
+    });
   };
 
   fetchCounties = () => {
@@ -135,23 +137,57 @@ class ClientAddEditForm extends Component {
     this.setState({ counties });
   };
 
+  handleChange = name => event => {
+    const newValue = event.target.value;
+    this.setState({
+      childInfo: {
+        ...this.state.childInfo,
+        [name]: newValue,
+      },
+    });
+    this.validateInput(name, newValue);
+  };
+
   validateInput = (fieldName, inputValue) => {
-    const fieldValidation = validate(fieldName, inputValue);
     const allValidations = this.state.childInfoValidation;
-    allValidations[fieldName] = fieldValidation;
-    const formValidation = isFormValid(allValidations);
+    allValidations[fieldName] = validate(fieldName, inputValue);
     this.setState({
       childInfoValidation: {
         ...allValidations,
       },
-      isSaveButtonDisabled: !formValidation,
+      isSaveButtonDisabled: !isFormValid(allValidations),
+    });
+  };
+
+  handleChangeCaseNumber = caseIndex => event => {
+    const newValue = event.target.value;
+    const cases = clone(this.state.childInfo.cases);
+    cases[caseIndex].external_id = newValue;
+    this.setState({
+      childInfo: {
+        ...this.state.childInfo,
+        cases,
+      },
+    });
+    this.validateCaseNumberInput(caseIndex, newValue);
+  };
+
+  validateCaseNumberInput = (caseIndex, inputValue) => {
+    const allValidations = clone(this.state.childInfoValidation);
+    allValidations.cases[caseIndex].external_id = validateCaseNumber(inputValue);
+    this.setState({
+      childInfoValidation: {
+        ...allValidations,
+      },
+      isSaveButtonDisabled: !isFormValid(allValidations),
     });
   };
 
   handleSubmit = event => {
+    const childInfo = this.prepareChildForSubmit(clone(this.state.childInfo));
     if (this.state.isNewForm) {
       event.preventDefault();
-      ClientService.addClient(this.state.childInfo)
+      ClientService.addClient(childInfo)
         .then(newChild => {
           this.setState({
             childInfo: newChild,
@@ -163,7 +199,7 @@ class ClientAddEditForm extends Component {
         })
         .catch(() => {});
     } else {
-      ClientService.updateClient(this.state.childInfo.id, this.state.childInfo)
+      ClientService.updateClient(childInfo.id, childInfo)
         .then(newChild => {
           this.setState({
             childInfo: newChild,
@@ -177,12 +213,52 @@ class ClientAddEditForm extends Component {
     }
   };
 
+  prepareChildForSubmit(childInfo) {
+    const cases = childInfo.cases;
+    for (let i = cases.length - 1; i >= 0; i--) {
+      if (!cases[i].external_id) {
+        cases.splice(i, 1);
+      }
+    }
+    return childInfo;
+  }
+
   handleCancel = () => {
     this.setState({
       redirection: {
         shouldRedirect: true,
       },
     });
+  };
+
+  handleAddCaseNumber = event => {
+    if (isA11yAllowedInput(event)) {
+      const childInfo = this.addCaseNumberToChildInfo();
+      const childInfoValidation = this.addCaseNumberToValidations();
+      this.setState({
+        childInfo,
+        childInfoValidation,
+        isSaveButtonDisabled: !isFormValid(childInfoValidation),
+      });
+    }
+  };
+
+  addCaseNumberToChildInfo = () => {
+    const cases = clone(this.state.childInfo.cases);
+    cases.push({ external_id: '' });
+    return {
+      ...this.state.childInfo,
+      cases: cases,
+    };
+  };
+
+  addCaseNumberToValidations = () => {
+    const casesValidation = clone(this.state.childInfoValidation.cases);
+    casesValidation.push({ external_id: true });
+    return {
+      ...this.state.childInfoValidation,
+      cases: casesValidation,
+    };
   };
 
   render() {
@@ -311,8 +387,6 @@ class ClientAddEditForm extends Component {
                 label="County"
                 error={!childInfoValidation['county']}
                 className={classes.textField}
-                open={this.state.open}
-                onClose={this.handleClose}
                 value={childInfo.county}
                 onChange={this.handleChange('county')}
                 helperText="Please select your County"
@@ -342,25 +416,39 @@ class ClientAddEditForm extends Component {
                   </MenuItem>
                 ))}
               </TextField>
-              <TextField
-                required
-                focused
-                id="case_id"
-                label="Case Number"
-                defaultValue={childInfo.case_id}
-                error={!childInfoValidation['case_id']}
-                className={classes.textField}
-                value={childInfo.case_id}
-                onChange={this.handleChange('case_id')}
-                inputProps={{ maxLength: 50, className: classes.inputText }}
-                margin="normal"
-                InputLabelProps={{
-                  style: {
-                    color: '#777777',
-                    fontSize: '1.8rem',
-                  },
-                }}
-              />
+              <div className={'case-numbers'}>
+                {childInfo.cases.map((aCase, index) => (
+                  <TextField
+                    key={index}
+                    focused
+                    label={index === 0 ? 'Case Number' : null}
+                    defaultValue={aCase.external_id}
+                    error={!childInfoValidation.cases[index].external_id}
+                    className={classes.textField}
+                    value={aCase.external_id}
+                    onChange={this.handleChangeCaseNumber(index)}
+                    inputProps={{ maxLength: 50, className: classes.inputText }}
+                    margin="normal"
+                    InputLabelProps={{
+                      style: {
+                        color: '#777777',
+                        fontSize: '1.8rem',
+                      },
+                    }}
+                  />
+                ))}
+                <h5>
+                  <div
+                    onClick={this.handleAddCaseNumber}
+                    onKeyPress={this.handleAddCaseNumber}
+                    className={'case-numbers-control'}
+                    role={'button'}
+                    tabIndex={0}
+                  >
+                    + ADD CASE NUMBER
+                  </div>
+                </h5>
+              </div>
             </form>
           </CardContent>
           <CardActions>
