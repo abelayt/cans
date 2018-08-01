@@ -285,10 +285,8 @@ class ClientAddEditForm extends Component {
             <form className={classes.container} noValidate autoComplete="off">
               <TextField
                 required
-                focused
                 id="first_name"
                 label="First Name"
-                defaultValue={childInfo.first_name}
                 error={!childInfoValidation['first_name']}
                 className={classes.textField}
                 value={childInfo.first_name}
@@ -308,10 +306,8 @@ class ClientAddEditForm extends Component {
 
               <TextField
                 required
-                focused
                 id="last_name"
                 label="Last Name"
-                defaultValue={childInfo.last_name}
                 error={!childInfoValidation['last_name']}
                 className={classes.textField}
                 value={childInfo.last_name}
@@ -325,12 +321,11 @@ class ClientAddEditForm extends Component {
                   },
                 }}
               />
+
               <TextField
                 required
-                focused
                 id="dob"
                 label="Date of Birth"
-                defaultValue={childInfo.dob}
                 value={childInfo.dob}
                 error={!childInfoValidation['dob']}
                 type="date"
@@ -348,17 +343,14 @@ class ClientAddEditForm extends Component {
 
               <InputMask
                 mask="9999-9999-9999-9999999"
-                defaultValue={childInfo.external_id}
                 value={childInfo.external_id}
                 onChange={this.handleChange('external_id')}
               >
                 {() => (
                   <TextField
                     required
-                    focused
                     id="external_id"
                     label="Client Id"
-                    defaultValue={childInfo.external_id}
                     helperText="Enter 19 digits number"
                     error={!childInfoValidation['external_id']}
                     className={classes.textField}
@@ -381,7 +373,6 @@ class ClientAddEditForm extends Component {
 
               <TextField
                 required
-                focused
                 select
                 id="county"
                 label="County"
@@ -416,13 +407,12 @@ class ClientAddEditForm extends Component {
                   </MenuItem>
                 ))}
               </TextField>
+
               <div className={'case-numbers'}>
                 {childInfo.cases.map((aCase, index) => (
                   <TextField
                     key={index}
-                    focused
                     label={index === 0 ? 'Case Number' : null}
-                    defaultValue={aCase.external_id}
                     error={!childInfoValidation.cases[index].external_id}
                     className={classes.textField}
                     value={aCase.external_id}
@@ -437,17 +427,19 @@ class ClientAddEditForm extends Component {
                     }}
                   />
                 ))}
-                <h5>
-                  <div
-                    onClick={this.handleAddCaseNumber}
-                    onKeyPress={this.handleAddCaseNumber}
-                    className={'case-numbers-control'}
-                    role={'button'}
-                    tabIndex={0}
-                  >
-                    + ADD CASE NUMBER
-                  </div>
-                </h5>
+                <div className={'case-numbers-controls'}>
+                  <h5>
+                    <div
+                      onClick={this.handleAddCaseNumber}
+                      onKeyPress={this.handleAddCaseNumber}
+                      className={'case-numbers-single-control'}
+                      role={'button'}
+                      tabIndex={0}
+                    >
+                      + ADD CASE NUMBER
+                    </div>
+                  </h5>
+                </div>
               </div>
             </form>
           </CardContent>
