@@ -64,7 +64,9 @@ class ClientAddEditForm extends Component {
       childInfo: {
         person_role: 'CLIENT',
         first_name: '',
+        middle_name: '',
         last_name: '',
+        suffix: '',
         dob: '',
         external_id: '',
         county: {
@@ -80,6 +82,8 @@ class ClientAddEditForm extends Component {
       childInfoValidation: {
         first_name: !isNewForm,
         last_name: !isNewForm,
+        middle_name: true,
+        suffix: true,
         dob: !isNewForm,
         external_id: !isNewForm,
         county: !isNewForm,
@@ -308,6 +312,25 @@ class ClientAddEditForm extends Component {
               />
 
               <TextField
+                focused
+                id="middle_name"
+                label="Middle Name"
+                defaultValue={childInfo.middle_name}
+                error={!childInfoValidation['middle_name']}
+                className={classes.textField}
+                value={childInfo.middle_name}
+                onChange={this.handleChange('middle_name')}
+                inputProps={{ maxLength: 50, className: classes.inputText }}
+                margin="normal"
+                InputLabelProps={{
+                  style: {
+                    color: '#777777',
+                    fontSize: '2rem',
+                  },
+                }}
+              />
+
+              <TextField
                 required
                 id="last_name"
                 label="Last Name"
@@ -316,6 +339,24 @@ class ClientAddEditForm extends Component {
                 value={childInfo.last_name}
                 onChange={this.handleChange('last_name')}
                 inputProps={{ maxLength: 50, className: classes.inputText }}
+                margin="normal"
+                InputLabelProps={{
+                  style: {
+                    color: '#777777',
+                    fontSize: '1.8rem',
+                  },
+                }}
+              />
+
+              <TextField
+                id="suffix"
+                label="Suffix"
+                defaultValue={childInfo.suffix}
+                error={!childInfoValidation['suffix']}
+                className={classes.textField}
+                value={childInfo.suffix}
+                onChange={this.handleChange('suffix')}
+                inputProps={{ maxLength: 10, className: classes.inputText }}
                 margin="normal"
                 InputLabelProps={{
                   style: {

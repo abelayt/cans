@@ -28,6 +28,28 @@ describe('ClientFormValidator', () => {
       expect(validate('last_name', '@')).toBe(false);
     });
 
+    it('middle_name', () => {
+      expect(validate('middle_name', 'Mike')).toBe(true);
+      expect(validate('middle_name', 'Mike John')).toBe(true);
+      expect(validate('middle_name', 'Mike  John')).toBe(false);
+      expect(validate('middle_name', 'Mike-John')).toBe(true);
+      expect(validate('middle_name', 'mike')).toBe(true);
+      expect(validate('middle_name', 'Mike1')).toBe(false);
+      expect(validate('middle_name', 'Mike-')).toBe(false);
+      expect(validate('middle_name', '   ')).toBe(false);
+      expect(validate('middle_name', 'Mike#')).toBe(false);
+      expect(validate('middle_name', '@')).toBe(false);
+      expect(validate('middle_name', '')).toBe(true);
+    });
+
+    it('suffix', () => {
+      expect(validate('suffix', 'Mr.')).toBe(true);
+      expect(validate('suffix', '')).toBe(true);
+      expect(validate('suffix', 'Jr. ')).toBe(false);
+      expect(validate('suffix', 'Jr.() ')).toBe(false);
+      expect(validate('suffix', 'Jr.Jr')).toBe(false);
+    });
+
     it('external_id', () => {
       expect(validate('external_id', '1234567891234567890')).toBe(true);
       expect(validate('external_id', '1234-5678-9123-4567890')).toBe(true);
@@ -128,7 +150,9 @@ describe('ClientFormValidator', () => {
       expect(
         isFormValid({
           first_name: 'Amber',
+          middle_name: 'Marie',
           last_name: 'Jersey',
+          suffix: 'Mrs.',
           dob: '10/12/2012',
           external_id: '1234567891234567890',
           county: { id: 1 },

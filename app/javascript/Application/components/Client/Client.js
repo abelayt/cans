@@ -39,17 +39,15 @@ class Client extends Component {
       .catch(() => this.setState({ childData: {} }));
   }
 
-  renderClientData(data, label) {
-    if (data) {
-      return (
-        <Grid item xs={6}>
-          <Typography variant={'headline'} color={'textSecondary'}>
-            {label}
-          </Typography>
-          {data}
-        </Grid>
-      );
-    }
+  renderClientData(data, label, gridSize = 3) {
+    return (
+      <Grid item xs={gridSize}>
+        <Typography variant={'headline'} color={'textSecondary'}>
+          {label}
+        </Typography>
+        {data}
+      </Grid>
+    );
   }
 
   formatClientId = num => {
@@ -105,11 +103,14 @@ class Client extends Component {
                   {childData && childData.id ? (
                     <Grid container spacing={24}>
                       {this.renderClientData(childData.first_name, 'First Name')}
+                      {this.renderClientData(childData.middle_name, 'Middle Name')}
                       {this.renderClientData(childData.last_name, 'Last Name')}
+                      {this.renderClientData(childData.suffix, 'Suffix')}
                       {this.renderClientData(childData.dob, 'Birth Date')}
-                      {this.renderClientData(childData.case_id, 'Case Number')}
-                      {this.renderClientData(this.formatClientId(childData.external_id), 'Client Id')}
                       {this.renderClientData(childData.county.name, 'County')}
+                      {this.renderClientData(this.formatClientId(childData.external_id), 'Client Id', 6)}
+                      {this.renderClientData(undefined, undefined, 6)}
+                      {this.renderClientData(childData.case_id, 'Case Number', 6)}
                     </Grid>
                   ) : (
                     <span id={'no-data'}>No Child Data Found</span>
