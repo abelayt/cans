@@ -6,7 +6,7 @@ import { MenuItem, TextField, Card, CardHeader, CardContent, CardActions, Button
 import { Redirect, Link } from 'react-router-dom';
 import { CountiesService } from './Counties.service';
 import { ClientService } from './Client.service';
-import { validate, validateCaseNumber, isFormValid } from './ClientFormValidator';
+import { validate, validateCaseNumber, validateCaseNumbersAreUnique, isFormValid } from './ClientFormValidator';
 import { PageInfo } from '../Layout';
 import { isA11yAllowedInput } from '../../util/events';
 import { clone } from '../../util/common';
@@ -160,27 +160,30 @@ class ClientAddEditForm extends Component {
   };
 
   handleChangeCaseNumber = caseIndex => event => {
-    const newValue = event.target.value;
     const cases = clone(this.state.childInfo.cases);
-    cases[caseIndex].external_id = newValue;
+    cases[caseIndex].external_id = event.target.value;
+    const childInfoValidation = {
+      ...this.state.childInfoValidation,
+      cases: this.validateCaseNumbers(cases),
+    };
     this.setState({
       childInfo: {
         ...this.state.childInfo,
         cases,
       },
+      childInfoValidation,
+      isSaveButtonDisabled: !isFormValid(childInfoValidation),
     });
-    this.validateCaseNumberInput(caseIndex, newValue);
   };
 
-  validateCaseNumberInput = (caseIndex, inputValue) => {
-    const allValidations = clone(this.state.childInfoValidation);
-    allValidations.cases[caseIndex].external_id = validateCaseNumber(inputValue);
-    this.setState({
-      childInfoValidation: {
-        ...allValidations,
-      },
-      isSaveButtonDisabled: !isFormValid(allValidations),
-    });
+  validateCaseNumbers = cases => {
+    const casesValidations = clone(this.state.childInfoValidation.cases);
+    for (const [index, aCase] of cases.entries()) {
+      casesValidations[index].external_id = validateCaseNumber(aCase.external_id);
+    }
+    const nonUniqueCasesIndices = validateCaseNumbersAreUnique(cases);
+    nonUniqueCasesIndices.forEach(index => (casesValidations[index].external_id = false));
+    return casesValidations;
   };
 
   handleSubmit = event => {

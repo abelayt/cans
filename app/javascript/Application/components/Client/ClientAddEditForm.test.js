@@ -171,6 +171,26 @@ describe('<ClientAddEditForm />', () => {
         expect(clientForm.state().childInfo.cases[0].external_id).toEqual('1234');
         expect(clientForm.state().childInfoValidation.cases[0].external_id).toBeTruthy();
       });
+
+      it('should validate duplicated case numbers', () => {
+        // given
+        const clientForm = getWrapperAdd()
+          .find('ClientAddEditForm')
+          .first()
+          .dive();
+        const clientFormInstance = clientForm.instance();
+        clientFormInstance.handleAddCaseNumber({ type: 'click' });
+
+        // when
+        clientFormInstance.handleChangeCaseNumber(0)({ target: { value: '1234' } });
+        expect(clientForm.state().childInfoValidation.cases[0].external_id).toBeTruthy();
+        clientFormInstance.handleChangeCaseNumber(1)({ target: { value: '1234' } });
+
+        // then
+        clientForm.update();
+        expect(clientForm.state().childInfoValidation.cases[0].external_id).toBeFalsy();
+        expect(clientForm.state().childInfoValidation.cases[1].external_id).toBeFalsy();
+      });
     });
 
     describe('#onFetchChildDataSuccess()', () => {

@@ -1,4 +1,4 @@
-import { validate, validateCaseNumber, isFormValid } from './ClientFormValidator';
+import { validate, validateCaseNumber, validateCaseNumbersAreUnique, isFormValid } from './ClientFormValidator';
 
 describe('ClientFormValidator', () => {
   describe('#validate()', () => {
@@ -82,6 +82,31 @@ describe('ClientFormValidator', () => {
       expect(validateCaseNumber('/')).toBeFalsy();
       expect(validateCaseNumber('a%')).toBeFalsy();
       expect(validateCaseNumber('123456789012345678901234567890123456789012345678901')).toBeFalsy();
+    });
+  });
+
+  describe('#validateCaseNumbersAreUnique()', () => {
+    it('should return empty array for a single case input', () => {
+      expect(validateCaseNumbersAreUnique([])).toEqual([]);
+      expect(validateCaseNumbersAreUnique([{}])).toEqual([]);
+    });
+
+    it('should return empty array for cases array with only unique ids', () => {
+      expect(validateCaseNumbersAreUnique([{ external_id: '1' }, { external_id: '2' }])).toEqual([]);
+    });
+
+    it('should return indices of non unique cases', () => {
+      const cases = [
+        { external_id: 'unique0' },
+        { external_id: '1' },
+        { external_id: '2' },
+        { external_id: '2' },
+        { external_id: 'unique1' },
+        { external_id: '1' },
+        { external_id: '2' },
+        { external_id: 'unique2' },
+      ];
+      expect(validateCaseNumbersAreUnique(cases).sort()).toEqual([1, 2, 3, 5, 6]);
     });
   });
 
