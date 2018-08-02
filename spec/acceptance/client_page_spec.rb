@@ -9,7 +9,10 @@ feature 'Client Pages' do
   given(:first_name) { Faker::Name.first_name }
   given(:last_name) { Faker::Name.last_name }
   given(:date_of_birth) { Faker::Date.between(20.years.ago, 10.years.ago) }
-  given(:case_number) { Faker::Number.number(10) }
+  given(:case_number) do
+    "#{Faker::Number.number(4)}-#{Faker::Number.number(3)}-"\
+    "#{Faker::Number.number(4)}-#{Faker::Number.number(8)}"
+  end
   given(:client_id) do
     "#{Faker::Number.number(4)}-#{Faker::Number.number(4)}-"\
     "#{Faker::Number.number(4)}-#{Faker::Number.number(7)}"

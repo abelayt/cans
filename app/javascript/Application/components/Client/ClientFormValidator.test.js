@@ -95,9 +95,8 @@ describe('ClientFormValidator', () => {
     });
 
     it('should return true for valid case numbers', () => {
-      expect(validateCaseNumber('a')).toBeTruthy();
-      expect(validateCaseNumber('abc')).toBeTruthy();
-      expect(validateCaseNumber('abcXYZ123')).toBeTruthy();
+      expect(validateCaseNumber('4321-321-4321-87654321')).toBeTruthy();
+      expect(validateCaseNumber('1234-123-1234-12345678')).toBeTruthy();
     });
 
     it('should return false for invalid case numbers', () => {

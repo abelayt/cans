@@ -20,7 +20,7 @@ export function validate(fieldName, value) {
 }
 
 export function validateCaseNumber(caseNumber) {
-  return !caseNumber || /^[a-zA-Z0-9]{1,50}$/i.test(caseNumber);
+  return !caseNumber || /^\d{4}-\d{3}-\d{4}-\d{8}$/i.test(caseNumber);
 }
 
 export function validateCaseNumbersAreUnique(cases) {
