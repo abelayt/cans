@@ -120,7 +120,7 @@ describe('<ClientAddEditForm />', () => {
       const wrapper = getWrapperEdit();
       const ClientEditWrapper = wrapper.find('ClientAddEditForm').dive();
       ClientEditWrapper.instance().handleChangeCaseNumber(0)({
-        target: { value: '1234567890987654321' },
+        target: { value: '4321-321-4321-87654321' },
       });
       expect(ClientEditWrapper.state('childInfoValidation').cases[0].external_id).toEqual(true);
       expect(ClientEditWrapper.state('isSaveButtonDisabled')).toEqual(false);
@@ -149,7 +149,7 @@ describe('<ClientAddEditForm />', () => {
         target: { value: { id: '5' } },
       });
       childFormInstance.handleChangeCaseNumber(0)({
-        target: { value: '123' },
+        target: { value: '4321-321-4321-87654321' },
       });
       expect(ClientEditWrapper.state('isSaveButtonDisabled')).toEqual(false);
     });
@@ -165,10 +165,10 @@ describe('<ClientAddEditForm />', () => {
           .dive();
 
         // when
-        clientForm.instance().handleChangeCaseNumber(0)({ target: { value: '1234' } });
+        clientForm.instance().handleChangeCaseNumber(0)({ target: { value: '4321-321-4321-87654321' } });
 
         // then
-        expect(clientForm.state().childInfo.cases[0].external_id).toEqual('1234');
+        expect(clientForm.state().childInfo.cases[0].external_id).toEqual('4321-321-4321-87654321');
         expect(clientForm.state().childInfoValidation.cases[0].external_id).toBeTruthy();
       });
 
@@ -182,9 +182,9 @@ describe('<ClientAddEditForm />', () => {
         clientFormInstance.handleAddCaseNumber({ type: 'click' });
 
         // when
-        clientFormInstance.handleChangeCaseNumber(0)({ target: { value: '1234' } });
+        clientFormInstance.handleChangeCaseNumber(0)({ target: { value: '4321-321-4321-87654321' } });
         expect(clientForm.state().childInfoValidation.cases[0].external_id).toBeTruthy();
-        clientFormInstance.handleChangeCaseNumber(1)({ target: { value: '1234' } });
+        clientFormInstance.handleChangeCaseNumber(1)({ target: { value: '4321-321-4321-87654321' } });
 
         // then
         clientForm.update();
