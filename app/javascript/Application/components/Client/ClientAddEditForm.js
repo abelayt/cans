@@ -1,9 +1,10 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import InputMask from 'react-input-mask';
+import { Row, Col, Button } from 'reactstrap';
 import { withStyles } from '@material-ui/core/styles';
-import { MenuItem, TextField, Card, CardHeader, CardContent, CardActions, Button } from '@material-ui/core';
-import { Redirect, Link } from 'react-router-dom';
+import { MenuItem, TextField, Card, CardHeader, CardContent } from '@material-ui/core';
+import { Redirect } from 'react-router-dom';
 import { CountiesService } from './Counties.service';
 import { ClientService } from './Client.service';
 import { validate, validateCaseNumber, validateCaseNumbersAreUnique, isFormValid } from './ClientFormValidator';
@@ -38,12 +39,9 @@ const styles = theme => ({
     backgroundColor: '#114161',
     color: '#fff',
   },
-
-  cardActions: {
-    marginLeft: 400,
-  },
   note: {
     color: '#ff0000',
+    marginTop: theme.spacing.unit,
   },
   title: {
     color: '#fff',
@@ -270,14 +268,16 @@ class ClientAddEditForm extends Component {
     const { shouldRedirect, successClientId } = redirection;
 
     if (shouldRedirect) {
-      return <Redirect push to={{ pathname: `/clients/${childInfo.id}`, state: { isNewForm, successClientId } }} />;
+      const pathName = isNewForm && !successClientId ? `/` : `/clients/${childInfo.id}`;
+      return <Redirect push to={{ pathname: pathName, state: { isNewForm, successClientId } }} />;
     }
+
     return (
       <Fragment>
         <PageInfo title={isNewForm ? 'Add Child/Youth' : 'Edit Child/Youth'} />
         <Card className={classes.cardWidth}>
           <CardHeader
-            className={classes.cardHeader}
+            className={'card-header-cans'}
             title="Child/Youth Information"
             classes={{
               title: classes.title,
@@ -415,6 +415,7 @@ class ClientAddEditForm extends Component {
                 {childInfo.cases.map((aCase, index) => (
                   <TextField
                     key={index}
+                    id={`caseNumber${index}`}
                     label={index === 0 ? 'Case Number' : null}
                     error={!childInfoValidation.cases[index].external_id}
                     className={classes.textField}
@@ -445,27 +446,25 @@ class ClientAddEditForm extends Component {
                 </div>
               </div>
             </form>
+            <div className={'add-edit-form-footer'}>
+              <Row>
+                <Col sm={4}>{this.state.isSaveButtonDisabled && <p className={classes.note}>*required fields</p>}</Col>
+                <Col sm={8} className={'add-edit-form-controls'}>
+                  <Button id={'cancel-button'} color={'link'} className={'cancel-button'} onClick={this.handleCancel}>
+                    Cancel
+                  </Button>
+                  <Button
+                    id={'save-button'}
+                    color={'primary'}
+                    disabled={isSaveButtonDisabled}
+                    onClick={this.handleSubmit}
+                  >
+                    Save
+                  </Button>
+                </Col>
+              </Row>
+            </div>
           </CardContent>
-          <CardActions>
-            {this.state.isSaveButtonDisabled && <p className={classes.note}>*required fields</p>},
-            <Link
-              onClick={this.handleCancel}
-              to={isNewForm ? `/` : `/clients/${childInfo.id}`}
-              className={classes.cardActions}
-            >
-              Cancel
-            </Link>
-            <Button
-              variant="raised"
-              size="large"
-              color="primary"
-              disabled={isSaveButtonDisabled}
-              className={classes.button}
-              onClick={this.handleSubmit}
-            >
-              Save
-            </Button>
-          </CardActions>
         </Card>
       </Fragment>
     );

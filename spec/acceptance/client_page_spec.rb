@@ -34,7 +34,7 @@ feature 'Client Pages' do
     expect(page).to have_content 'Child/Youth Profile'
     expect(page).to have_content first_name
     expect(page).to have_content last_name
-    expect(page).to have_content case_number
+    # expect(page).to have_content case_number
     expect(page).to have_content client_id
     expect(page).to have_content 'Fresno'
   end

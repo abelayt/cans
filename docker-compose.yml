@@ -2,7 +2,7 @@ version: '3.2'
 services:
 
   postgres:
-    image: cwds/postgresql_data:0.8.1_637-RC
+    image: cwds/postgresql_data
     hostname: postgresql_data
     ports:
       - ${POSTGRES_PORT}:5432

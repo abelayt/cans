@@ -11,7 +11,7 @@ module LoginHelper
   private
 
   def need_login?
-    ENV.fetch('CANS_AUTHORIZATION_ENABLED', false) && !page.has_content?('CANS')
+    ENV.fetch('CANS_AUTHORIZATION_ENABLED', true) && !page.has_content?('CANS')
   end
 
   def default_json
