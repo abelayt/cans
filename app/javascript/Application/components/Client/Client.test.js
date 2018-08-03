@@ -68,6 +68,7 @@ describe('<Client />', () => {
           dob: '10/10/1980',
           external_id: '1234567891234567890',
           county: { name: 'Sacramento' },
+          cases: [],
         },
       });
     });

@@ -129,6 +129,10 @@ class ClientAddEditForm extends Component {
   };
 
   onFetchChildDataSuccess = childInfo => {
+    if (childInfo.cases.length === 0) {
+      childInfo.cases.push({ external_id: '' });
+    }
+
     const childInfoValidation = {
       ...this.state.childInfoValidation,
       cases: [],

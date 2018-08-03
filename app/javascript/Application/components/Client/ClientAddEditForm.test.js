@@ -208,12 +208,30 @@ describe('<ClientAddEditForm />', () => {
         clientForm.update();
 
         // then
-        expect(clientForm.find('.case-numbers>TextField').length).toEqual(3);
+        expect(clientForm.find('.case-numbers>InputElement').length).toEqual(3);
         const expectedCasesValidation = clientForm.state().childInfoValidation.cases;
         expect(expectedCasesValidation.length).toEqual(3);
         expect(expectedCasesValidation[0]).toEqual({ external_id: true });
         expect(expectedCasesValidation[1]).toEqual({ external_id: true });
         expect(expectedCasesValidation[2]).toEqual({ external_id: true });
+      });
+
+      it('should add an initial case if child has no cases', () => {
+        // given
+        const clientForm = getWrapperAdd()
+          .find('ClientAddEditForm')
+          .first()
+          .dive();
+
+        // when
+        clientForm.instance().onFetchChildDataSuccess({ cases: [] });
+        clientForm.update();
+
+        // then
+        expect(clientForm.find('.case-numbers>InputElement').length).toEqual(1);
+        const expectedCasesValidation = clientForm.state().childInfoValidation.cases;
+        expect(expectedCasesValidation.length).toEqual(1);
+        expect(expectedCasesValidation[0]).toEqual({ external_id: true });
       });
     });
 
@@ -230,7 +248,7 @@ describe('<ClientAddEditForm />', () => {
         clientForm.update();
 
         // then
-        expect(clientForm.find('.case-numbers>TextField').length).toEqual(2);
+        expect(clientForm.find('.case-numbers>InputElement').length).toEqual(2);
         const expectedCases = clientForm.state().childInfo.cases;
         expect(expectedCases.length).toEqual(2);
         expect(expectedCases[1]).toEqual({ external_id: '' });
