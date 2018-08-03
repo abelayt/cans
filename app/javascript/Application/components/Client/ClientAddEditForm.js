@@ -55,6 +55,19 @@ const styles = theme => ({
   },
 });
 
+const inputLabelProps = {
+  style: {
+    color: '#777777',
+    fontSize: '1.8rem',
+  },
+};
+
+const helperTextProps = {
+  style: {
+    fontSize: '1rem',
+  },
+};
+
 class ClientAddEditForm extends Component {
   constructor(props) {
     super(props);
@@ -283,9 +296,7 @@ class ClientAddEditForm extends Component {
           <CardHeader
             className={'card-header-cans'}
             title="Child/Youth Information"
-            classes={{
-              title: classes.title,
-            }}
+            classes={{ title: classes.title }}
           />
 
           <CardContent>
@@ -298,17 +309,9 @@ class ClientAddEditForm extends Component {
                 className={classes.textField}
                 value={childInfo.first_name}
                 onChange={this.handleChange('first_name')}
-                inputProps={{
-                  maxLength: 50,
-                  className: classes.inputText,
-                }}
+                inputProps={{ maxLength: 50, className: classes.inputText }}
                 margin="normal"
-                InputLabelProps={{
-                  style: {
-                    color: '#777777',
-                    fontSize: '1.8rem',
-                  },
-                }}
+                InputLabelProps={inputLabelProps}
               />
 
               <TextField
@@ -322,12 +325,7 @@ class ClientAddEditForm extends Component {
                 onChange={this.handleChange('middle_name')}
                 inputProps={{ maxLength: 50, className: classes.inputText }}
                 margin="normal"
-                InputLabelProps={{
-                  style: {
-                    color: '#777777',
-                    fontSize: '2rem',
-                  },
-                }}
+                InputLabelProps={inputLabelProps}
               />
 
               <TextField
@@ -340,12 +338,7 @@ class ClientAddEditForm extends Component {
                 onChange={this.handleChange('last_name')}
                 inputProps={{ maxLength: 50, className: classes.inputText }}
                 margin="normal"
-                InputLabelProps={{
-                  style: {
-                    color: '#777777',
-                    fontSize: '1.8rem',
-                  },
-                }}
+                InputLabelProps={inputLabelProps}
               />
 
               <TextField
@@ -358,12 +351,7 @@ class ClientAddEditForm extends Component {
                 onChange={this.handleChange('suffix')}
                 inputProps={{ maxLength: 10, className: classes.inputText }}
                 margin="normal"
-                InputLabelProps={{
-                  style: {
-                    color: '#777777',
-                    fontSize: '1.8rem',
-                  },
-                }}
+                InputLabelProps={inputLabelProps}
               />
 
               <TextField
@@ -377,11 +365,8 @@ class ClientAddEditForm extends Component {
                 onChange={this.handleChange('dob')}
                 inputProps={{ className: classes.inputText }}
                 InputLabelProps={{
+                  ...inputLabelProps,
                   shrink: true,
-                  style: {
-                    color: '#777777',
-                    fontSize: '1.8rem',
-                  },
                 }}
               />
 
@@ -395,22 +380,13 @@ class ClientAddEditForm extends Component {
                     required
                     id="external_id"
                     label="Client Id"
-                    helperText="Enter 19 digits number"
+                    helperText={!childInfoValidation['external_id'] ? 'Enter 19 digits number' : null}
                     error={!childInfoValidation['external_id']}
                     className={classes.textField}
                     margin="normal"
                     inputProps={{ className: classes.inputText }}
-                    InputLabelProps={{
-                      style: {
-                        color: '#777777',
-                        fontSize: '1.8rem',
-                      },
-                    }}
-                    FormHelperTextProps={{
-                      style: {
-                        fontSize: '1rem',
-                      },
-                    }}
+                    InputLabelProps={inputLabelProps}
+                    FormHelperTextProps={helperTextProps}
                   />
                 )}
               </InputMask>
@@ -424,20 +400,11 @@ class ClientAddEditForm extends Component {
                 className={classes.textField}
                 value={childInfo.county}
                 onChange={this.handleChange('county')}
-                helperText="Please select your County"
+                helperText={!childInfoValidation['county'] ? 'Please select your County' : null}
                 margin="normal"
                 inputProps={{ className: classes.inputText }}
-                InputLabelProps={{
-                  style: {
-                    color: '#777777',
-                    fontSize: '1.8rem',
-                  },
-                }}
-                FormHelperTextProps={{
-                  style: {
-                    fontSize: '1rem',
-                  },
-                }}
+                InputLabelProps={inputLabelProps}
+                FormHelperTextProps={helperTextProps}
               >
                 {!isNewForm && (
                   <MenuItem className={classes.menu} selected={true} value={childInfo.county}>
@@ -454,23 +421,27 @@ class ClientAddEditForm extends Component {
 
               <div className={'case-numbers'}>
                 {childInfo.cases.map((aCase, index) => (
-                  <TextField
+                  <InputMask
                     key={index}
-                    id={`caseNumber${index}`}
-                    label={index === 0 ? 'Case Number' : null}
-                    error={!childInfoValidation.cases[index].external_id}
-                    className={classes.textField}
+                    mask="9999-999-9999-99999999"
                     value={aCase.external_id}
                     onChange={this.handleChangeCaseNumber(index)}
-                    inputProps={{ maxLength: 50, className: classes.inputText }}
-                    margin="normal"
-                    InputLabelProps={{
-                      style: {
-                        color: '#777777',
-                        fontSize: '1.8rem',
-                      },
-                    }}
-                  />
+                  >
+                    {() => (
+                      <TextField
+                        key={index}
+                        id={`caseNumber${index}`}
+                        label={index === 0 ? 'Case Number' : null}
+                        error={!childInfoValidation.cases[index].external_id}
+                        className={classes.textField}
+                        helperText={!childInfoValidation.cases[index].external_id ? 'Enter 19 digits number' : null}
+                        inputProps={{ className: classes.inputText }}
+                        margin="normal"
+                        InputLabelProps={inputLabelProps}
+                        FormHelperTextProps={helperTextProps}
+                      />
+                    )}
+                  </InputMask>
                 ))}
                 <div className={'case-numbers-controls'}>
                   <h5>
