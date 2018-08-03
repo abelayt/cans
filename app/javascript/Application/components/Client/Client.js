@@ -66,6 +66,14 @@ class Client extends Component {
     }
   };
 
+  formatCases(cases) {
+    if (!cases) return null;
+    const items = cases.map(aCase => {
+      return <li key={aCase.external_id}>{aCase.external_id}</li>;
+    });
+    return <ul className={'no-indent-list'}>{items}</ul>;
+  }
+
   render() {
     const { isNewForm, childData, shouldRenderClientMessage } = this.state;
     return (
@@ -110,7 +118,11 @@ class Client extends Component {
                       {this.renderClientData(childData.county.name, 'County')}
                       {this.renderClientData(this.formatClientId(childData.external_id), 'Client Id', 6)}
                       {this.renderClientData(undefined, undefined, 6)}
-                      {this.renderClientData(childData.case_id, 'Case Number', 6)}
+                      {this.renderClientData(
+                        this.formatCases(childData.cases),
+                        childData.cases.length > 1 ? 'Case Numbers' : 'Case Number',
+                        6
+                      )}
                     </Grid>
                   ) : (
                     <span id={'no-data'}>No Child Data Found</span>
